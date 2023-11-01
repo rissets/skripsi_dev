@@ -1,0 +1,10 @@
+[
+  {
+    "model": "gpt-4",
+    "api_key": "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"
+  },
+  {
+    "model": "gpt-3.5-turbo-16k",
+    "api_key": "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"
+  }
+]
