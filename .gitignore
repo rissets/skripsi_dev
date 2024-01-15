@@ -4,3 +4,7 @@
 autogen/.cache
 autogen/.cache/*
 
+venv/*
+venv/
+venv
+/venv

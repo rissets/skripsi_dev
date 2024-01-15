@@ -1,0 +1,4 @@
+http://localhost:5000/v1/chat/completions
+header: Content-Type: application/json
+body: {"text": "I want to buy a"}
+method: POST

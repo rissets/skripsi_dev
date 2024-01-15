@@ -1,0 +1,30 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Sidebar 03</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {% include "snippets/styles.html" %}
+
+    {% block extra_style %}
+    {% endblock %}
+</head>
+<body>
+
+<div class="wrapper d-flex align-items-stretch">
+    {% include "snippets/sidebar.html" %}
+
+    <!-- Page Content  -->
+    {% block content %}
+    {% endblock %}
+
+    {% block extra_script %}
+    {% endblock %}
+</div>
+
+{% include "snippets/scripts.html" %}
+</body>
+</html>

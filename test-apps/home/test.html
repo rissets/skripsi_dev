@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Interface</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="flex h-screen bg-gray-100">
+        <div class="w-64 bg-gray-800 text-white p-6">
+            <h2 class="text-2xl font-bold mb-4">Sider</h2>
+            <ul class="space-y-2">
+                <li class="hover:bg-gray-700 p-2 rounded cursor-pointer">ChatGPT Sidebar</li>
+                <li class="hover:bg-gray-700 p-2 rounded cursor-pointer">Mencari</li>
+                <li class="hover:bg-gray-700 p-2 rounded cursor-pointer">Chat with N</li>
+                <li class="hover:bg-gray-700 p-2 rounded cursor-pointer">Group Chat</li>
+                <li class="hover:bg-gray-700 p-2 rounded cursor-pointer">ChatGPT</li>
+                <li class="hover:bg-gray-700 p-2 rounded cursor-pointer">Painter</li>
+                <li class="hover:bg-gray-700 p-2 rounded cursor-pointer">Bing Webapp</li>
+                <li class="hover:bg-gray-700 p-2 rounded cursor-pointer">Bard Webapp</li>
+                <li class="hover:bg-gray-700 p-2 rounded cursor-pointer">#Undang untuk mendapatkan pertanyaan Teks Tingkat Lanjut</li>
+                <li class="hover:bg-gray-700 p-2 rounded cursor-pointer">Teks Cepat</li>
+                <li class="hover:bg-gray-700 p-2 rounded cursor-pointer">Rencana:</li>
+                <li class="hover:bg-gray-700 p-2 rounded cursor-pointer">Tambahan:</li>
+            </ul>
+        </div>
+        <div class="flex-1 p-6">
+            <div class="bg-white p-4 rounded shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold">Group Chat</h2>
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        + Obrolan Baru
+                    </button>
+                </div>
+                <div id="messages" class="space-y-4">
+                    <!-- Messages will be inserted here by JavaScript -->
+                </div>
+                <div class="mt-4">
+                    <input id="message-input" type="text" placeholder="Ketik pesan..." class="w-full p-2 border border-gray-300 rounded" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

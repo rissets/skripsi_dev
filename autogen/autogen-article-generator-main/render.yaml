@@ -1,0 +1,9 @@
+services:
+  - name: autogen-article-generator
+    type: web
+    buildCommand: docker build -t autogen-article-generator .
+    startCommand: docker run -p 7860:7860 autogen-article-generator
+    env: 
+      - key: RUNTIME
+        value: docker
+    healthCheckPath: /
