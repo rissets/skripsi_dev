@@ -77,10 +77,10 @@ const ask_gpt = async (message) => {
     stop_generating.classList.remove(`stop_generating-hidden`);
 
     message_box.innerHTML += `
-            <div class="message pb-3 border-bottom">
+            <div class="message pb-3 border-bottom border-top">
                 <div class="user">
                     ${user_image}
-                    <i class="fa-regular fa-phone-arrow-up-right"></i>
+                    
                 </div>
                 <div class="content" id="user_${token}"> 
                     ${format(message)}
@@ -96,9 +96,9 @@ const ask_gpt = async (message) => {
     window.scrollTo(0, 0);
 
     message_box.innerHTML += `
-            <div class="message pb-3 border-bottom">
+            <div class="message pb-3">
                 <div class="user">
-                    ${gpt_image} <i class="fa-regular fa-phone-arrow-down-left"></i>
+                    ${gpt_image}
                 </div>
                 <div class="content" id="gpt_${window.token}">
                     <div id="cursor"></div>
@@ -111,7 +111,7 @@ const ask_gpt = async (message) => {
     await new Promise((r) => setTimeout(r, 1000));
     window.scrollTo(0, 0);
 
-    const response = await fetch(`/chat/backend-api/v2/conversation`, {
+    const response = await fetch(`/api/v2/chat/conversation`, {
       method: `POST`,
       signal: window.controller.signal,
       headers: {
@@ -150,7 +150,7 @@ const ask_gpt = async (message) => {
 
       if (
         chunk.includes(
-          `<form id="challenge-form" action="/chat/backend-api/v2/conversation?`
+          `<form id="challenge-form" action="/api/v2/chat/conversation?`
         )
       ) {
         chunk = `cloudflare token expired, please refresh the page.`;
@@ -310,11 +310,7 @@ const load_conversation = async (conversation_id) => {
             <div class="message">
                 <div class="user">
                     ${item.role == "assistant" ? gpt_image : user_image}
-                    ${
-                      item.role == "assistant"
-                        ? `<i class="fa-regular fa-phone-arrow-down-left"></i>`
-                        : `<i class="fa-regular fa-phone-arrow-up-right"></i>`
-                    }
+
                 </div>
                 <div class="content">
                     ${
