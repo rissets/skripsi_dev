@@ -8,8 +8,8 @@ from autogen.agentchat.contrib.capabilities import Teachability
 
 config_list=[
     {
-        "model": "TheBloke/Magicoder-S-DS-6.7B-GPTQ",
-        "base_url": "https://tions-lights-dot-israeli.trycloudflare.com/v1",
+        "model": "TheBloke_Magicoder-S-DS-6.7B-GPTQ_gptq-4bit-32g-actorder_True",
+        "base_url": "https://br-interpreted-deadly-voted.trycloudflare.com/v1",
         'api_key': 'any string here is fine',
         # 'api_type': 'openai',
     }
@@ -17,7 +17,7 @@ config_list=[
 
 llm_config = {
     "config_list": config_list,
-    "temperature": 0.2,
+    "temperature": 0.7,
     "seed": 1117,
     "timeout": 6000,
 }
@@ -36,12 +36,18 @@ teachability = Teachability(
 # Now add teachability to the agent.
 teachability.add_to_agent(teachable_agent)
 
-# For this test, create a user proxy agent as usual.
-user = UserProxyAgent("user", human_input_mode="ALWAYS")
 
+# For this test, create a user proxy agent as usual.
+user = UserProxyAgent("user", human_input_mode="ALWAYS", max_consecutive_auto_reply=0)
 
 
 #%%
 # This function will return once the user types 'exit'.
-teachable_agent.initiate_chat(user, message="Hi, I'm a teachable user assistant! What's on your mind?")
+teachable_agent.initiate_chat(user, message="Hi, I'm a teachable user assistant! What's on your mind?", clear_history=False)
 #%%
+
+user_proxy = UserProxyAgent("user", human_input_mode="ALWAYS", max_consecutive_auto_reply=0)
+
+user_proxy.initiate_chat(teachable_agent, message="apa saja berkas pendaftaran sidang ta1 ?")
+#%%
+

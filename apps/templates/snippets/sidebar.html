@@ -14,10 +14,19 @@
                     <a href="{% url "dashboard" %}"><span class="fa fa-home mr-3"></span> Home</a>
                 </li>
                 <li>
-                    <a href="{% url "chat:index" %}"><span class="fa fa-user mr-3"></span> Chat</a>
+                    <a href="{% url "chat:index" %}"><span class="fa fa-whatsapp mr-3"></span> Chat</a>
                 </li>
                 <li>
                     <a href="{% url "chat:pdf" %}"><span class="fa fa-file-pdf-o mr-3"></span> Chat PDF</a>
+                </li>
+                <li>
+                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false"
+                        class="dropdown-toggle"><span class="fa fa-users mr-3"></span> Teachable Model</a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                        <li>
+                            <a href="{% url "chat:teachable-agent" %}">Teachable Agents</a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
 

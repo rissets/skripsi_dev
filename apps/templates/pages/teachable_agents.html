@@ -1,0 +1,51 @@
+{% extends "pages/base.html" %}
+
+{% block content %}
+    <div id="content" class="p-4 p-md-5 pt-5">
+        <h2 class="mb-4">Teachable Agents</h2>
+        <div class="container">
+            {% if agents %}
+            <div class="row">
+                <div class="col-12">
+                    <a href="{% url "chat:create-teachable-agent" %}" class="btn btn-primary mb-3"><i class="fa fa-plus"></i> Create Agent</a>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Mode</th>
+                            <th scope="col">Created At</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for agent in agents %}
+                        <tr>
+                            <th scope="row">{{ agent.id }}</th>
+                            <td>{{ agent.name }}</td>
+                            <td>{{ agent.mode }}</td>
+                            <td>{{ agent.created_at }}</td>
+                            <td>
+                                {% if agent.mode == "PDF" and not agent.is_active %}
+                                <a href="{% url "chat:teachable" agent.slug %}" class="btn btn-primary disabled"><i class="fa fa-eye-slash"></i></a>
+                                {% else %}
+                                <a href="{% url "chat:teachable" agent.slug %}" class="btn btn-primary"><i class="fa fa-eye"></i></a>
+                                {% endif %}
+                                <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+                {% else %}
+                <div class="row">
+                    <div class="col-12">
+                        <p>No agents found.</p>
+                    <a href="{% url "chat:create-teachable-agent" %}" class="btn btn-primary"><i class="fa fa-plus"></i> Create Agent</a>
+                    </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

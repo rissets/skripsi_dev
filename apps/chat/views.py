@@ -10,10 +10,26 @@ from requests import get, post
 from json import loads
 
 from .config import special_instructions
-from .forms import PDFForm
+from .forms import PDFForm, TeachableAgentForm
 from .models import PDF
 
 
+class TeachableView(View):
+    def get(self, request, *args, **kwargs):
+        slug = kwargs.get('slug')
+        agent = request.user.teachable_agents.get(slug=slug)
+        if agent.mode == 'QA':
+            return render(request, "pages/teachable.html", {'teachable_agent': slug})
+        if agent.mode == 'PDF':
+            pdfs = request.user.pdfs.all()
+            return render(request, "pages/teachable_pdf.html", {'teachable_agent': slug, 'pdfs': pdfs})
+        return redirect('chat:teachable-agent')
+
+
+
+class ChatView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "pages/chat.html")
 
 
 def read_pdf(pdf_file):
@@ -30,11 +46,6 @@ def read_pdf(pdf_file):
         num_pages = len(pdf_reader.pages)
 
     return pdf_text, count_words, num_pages
-
-
-class ChatView(View):
-    def get(self, request, *args, **kwargs):
-        return render(request, "pages/chat.html")
 
 
 class ChatPDFView(View):
@@ -79,78 +90,24 @@ class RenderPDF(View):
         pdf = PDF.objects.get(pk=kwargs['pk'])
         return render(request, 'pages/render-pdf.html', {'pdf': pdf})
 
-# class BackendApi(View):
-#     @method_decorator(csrf_exempt)
-#     @method_decorator(require_POST)
-#     def dispatch(self, *args, **kwargs):
-#         return super().dispatch(*args, **kwargs)
-#
-#     def post(self, request, *args, **kwargs):
-#         # print(request.body)
-#         try:
-#             json_data = loads(request.body)
-#             # jailbreak = json_data['jailbreak']
-#             # internet_access = json_data['meta']['content']['internet_access']
-#             _conversation = json_data['meta']['content']['conversation']
-#             prompt = json_data['meta']['content']['parts'][0]
-#             current_date = datetime.now().strftime("%Y-%m-%d")
-#             system_message = 'You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.'
-#
-#
-#             conversation = [{'role': 'system', 'content': system_message}] + \
-#                            _conversation + [prompt]
-#
-#             url = 'https://seconds-ascii-select-below.trycloudflare.com/v1/chat/completions'
-#
-#             gpt_resp = post(
-#                 url=url,
-#                 headers={
-#                     "Content-Type": "application/json"
-#                 },
-#                 json={
-#                     'mode': "instruct",
-#                     'messages': conversation,
-#                     'stream': True
-#                 },
-#                 stream=True
-#             )
-#
-#             if gpt_resp.status_code >= 400:
-#                 error_data = gpt_resp.json().get('error', {})
-#                 error_code = error_data.get('code', None)
-#                 error_message = error_data.get('message', "An error occurred")
-#                 return JsonResponse({
-#                     'successs': False,
-#                     'error_code': error_code,
-#                     'message': error_message,
-#                     'status_code': gpt_resp.status_code
-#                 }, status=gpt_resp.status_code)
-#
-#             def stream():
-#                 for chunk in gpt_resp.iter_lines():
-#                     try:
-#                         decoded_line = loads(chunk.decode("utf-8").split("data: ")[1])
-#                         token = decoded_line["choices"][0]['message'].get('content')
-#                         print(token)
-#
-#                         if token is not None:
-#                             yield token
-#
-#                     except GeneratorExit:
-#                         break
-#
-#                     except Exception as e:
-#                         print(e)
-#                         print(e.__traceback__.tb_next)
-#                         continue
-#
-#             return StreamingHttpResponse(stream(), content_type='text/event-stream')
-#
-#         except Exception as e:
-#             print(e)
-#             print(e.__traceback__.tb_next)
-#             return JsonResponse({
-#                 '_action': '_ask',
-#                 'success': False,
-#                 "error": f"an error occurred {str(e)}"
-#             }, status=400)
+
+class CreateTeachableAgent(View):
+    template_name = "pages/create-teachable-agent.html"
+    form = TeachableAgentForm
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, {'form': self.form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form(request.POST)
+        if form.is_valid():
+            teachable_agent = form.save(commit=False)
+            teachable_agent.user = request.user
+            teachable_agent.save()
+            return redirect('chat:teachable-agent')
+        return render(request, self.template_name, {'form': form})
+
+
+class TeachableAgentView(View):
+    def get(self, request, *args, **kwargs):
+        agents = request.user.teachable_agents.all()
+        return render(request, "pages/teachable_agents.html", {'agents': agents})

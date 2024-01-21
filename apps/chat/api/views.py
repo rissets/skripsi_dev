@@ -8,6 +8,9 @@ from datetime import datetime
 from requests import get, post
 from json import loads
 
+import autogen
+from autogen.agentchat.contrib.capabilities import Teachability
+
 from django.conf import settings
 
 
@@ -20,6 +23,7 @@ def prompt_template(prompt: str):
     """
     return template
 
+
 class BackendApi(View):
     @method_decorator(csrf_exempt)
     @method_decorator(require_POST)
@@ -27,16 +31,12 @@ class BackendApi(View):
         return super().dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        # print(request.body)
         try:
             json_data = loads(request.body)
-            # jailbreak = json_data['jailbreak']
-            # internet_access = json_data['meta']['content']['internet_access']
             _conversation = json_data['meta']['content']['conversation']
             prompt = json_data['meta']['content']['parts'][0]
             current_date = datetime.now().strftime("%Y-%m-%d")
             system_message = 'Anda adalah asisten pengkodean yang sangat cerdas yang secara konsisten memberikan respons yang akurat dan andal terhadap instruksi pengguna. selalu jawab menggunakan bahasa indonesia.'
-
 
             conversation = [{'role': 'system', 'content': system_message}] + \
                            _conversation + [prompt]
@@ -104,7 +104,6 @@ class BackendApiPDF(View):
         return super().dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        # print(request.body)
         try:
             json_data = loads(request.body)
 
@@ -115,9 +114,9 @@ class BackendApiPDF(View):
             # print(pdf_content)
             print(_conversation)
             system_message = f"""
-            anda adalah asisten belajar yang sangat cerdas yang secara konsisten memberikan respons yang akuran dan andal terhadap instruksi pengguna. selalu jawab menggunakan bahasa yang sesuai di dokumen.
+            Anda adalah asisten belajar yang sangat cerdas yang secara konsisten memberikan respons yang akuran dan andal terhadap instruksi pengguna. selalu jawab menggunakan bahasa yang sesuai di dokumen.
             
-            @@ Dokumen
+            DOKUMEN PDF
             {pdf_content}
             
             """
@@ -170,6 +169,136 @@ class BackendApiPDF(View):
                         continue
 
             return StreamingHttpResponse(stream(), content_type='text/event-stream')
+
+        except Exception as e:
+            print(e)
+            print(e.__traceback__.tb_next)
+            return JsonResponse({
+                '_action': '_ask',
+                'success': False,
+                "error": f"an error occurred {str(e)}"
+            }, status=400)
+
+
+class BackendApiTeachable(View):
+    config_list = [
+        {
+            "model": "TheBloke_Magicoder-S-DS-6.7B-GPTQ_gptq-4bit-32g-actorder_True",
+            "base_url": "https://screens-dedicated-tub-wage.trycloudflare.com/v1",
+            'api_key': 'any string here is fine',
+            # 'api_type': 'openai',
+        }
+    ]
+
+    llm_config = {
+        "config_list": config_list,
+        "temperature": 0.7,
+        "seed": 1117,
+        "timeout": 120,
+    }
+
+    def create_teachable_agent(self, reset_db=False, verbosity=0, db_dir=None):
+
+        # Start by instantiating any agent that inherits from ConversableAgent.
+        teachable_agent = autogen.ConversableAgent(
+            name="teachable_agent",
+            llm_config={"config_list": self.config_list, "timeout": 120, "cache_seed": None},  # Disable caching.
+        )
+
+        # Instantiate the Teachability capability. Its parameters are all optional.
+        teachability = Teachability(
+            verbosity=verbosity,
+            reset_db=reset_db,
+            path_to_db_dir=f"./tmp/{db_dir}/teachability_db",
+            recall_threshold=0.5,  # Higher numbers allow more (but less relevant) memos to be recalled.
+        )
+
+        # Now add the Teachability capability to the agent.
+        teachability.add_to_agent(teachable_agent)
+
+        return teachable_agent, teachability
+
+    def interact_freely_with_agent(self, message, db_dir):
+        """Starts a free-form chat between the user and a teachable agent."""
+
+        # Create the agents.
+        teachable_agent, teachability = self.create_teachable_agent(reset_db=False, verbosity=0, db_dir=db_dir)
+        user = autogen.UserProxyAgent("user", human_input_mode="NEVER", max_consecutive_auto_reply=0,
+                                      code_execution_config={"work_dir": "./tmp/notebook", "use_docker": False})
+        # teachability.prepopulate_db()
+        teachable_agent.initiate_chat(user, message="Hi, I'm a teachable user assistant! What's on your mind?",
+                                      clear_history=True)
+
+        # Start the chat.
+        user.send(recipient=teachable_agent, message=message)
+
+        response = user.last_message(teachable_agent)
+        return response
+
+    def extract_pdf(self, pdf_text):
+        # extract pdf per dot if after . is capital letter
+        paragraphs = []
+        paragraph = ''
+        for word in pdf_text.split():
+            if word.endswith('.'):
+                paragraph += word
+                paragraphs.append(paragraph)
+                paragraph = ''
+            else:
+                paragraph += word + ' '
+
+        return paragraphs
+
+    @method_decorator(csrf_exempt)
+    @method_decorator(require_POST)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            json_data = loads(request.body)
+            # _conversation = json_data['meta']['content']['conversation']
+            prompt = json_data['meta']['content']['parts'][0]['content']
+            teachable_agent = json_data['meta']['content']['teachable_agent_slug']
+
+            agent = request.user.teachable_agents.get(slug=teachable_agent)
+
+            if agent.mode == 'QA':
+                conversation = prompt
+                response = self.interact_freely_with_agent(conversation, db_dir=teachable_agent)
+
+                print(response['content'])
+
+                def stream():
+                    # respon kata perkata
+                    for chunk in response['content']:
+                        yield chunk
+
+                return StreamingHttpResponse(stream(), content_type='text/event-stream')
+            else:
+                pdf = request.user.pdfs.get(pk=int(json_data['meta']['content']['pdf_id']))
+
+                if agent.is_active:
+                    agent.is_active = False
+                    agent.save()
+
+                responses = []
+                for conversation in self.extract_pdf(pdf.content):
+                    response = self.interact_freely_with_agent(conversation, db_dir=teachable_agent)
+                    responses.append(response['content'])
+
+                agent.is_active = True
+                agent.save()
+
+                def stream():
+                    # respon kata perkata
+                    for chunk in responses:
+                        for chunk2 in chunk:
+                            yield chunk2
+
+                return StreamingHttpResponse(stream(), content_type='text/event-stream')
+
+
 
         except Exception as e:
             print(e)

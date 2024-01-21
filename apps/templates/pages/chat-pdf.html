@@ -1,96 +1,98 @@
 {% extends "pages/base.html" %}
 
 {% block extra_style %}
-<style>
-.drop-area {
-    border: 2px dashed #ccc;
-    border-radius: 5px;
-    padding: 20px;
-    text-align: center;
-    font-size: 18px;
-    color: #ccc;
-    height: 200px;
-}
+    <style>
+        .drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            font-size: 18px;
+            color: #ccc;
+            height: 200px;
+        }
 
-.drop-area.drag-over {
-    background-color: #eee;
-    border-color: #007bff;
-    color: #007bff;
-}
+        .drop-area.drag-over {
+            background-color: #eee;
+            border-color: #007bff;
+            color: #007bff;
+        }
 
-.drop-area .file-input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-}
-</style>
+        .drop-area .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+    </style>
 
 {% endblock %}
 
 {% block content %}
     <div id="content" class="p-4 p-md-5 pt-5">
         <div class="container mt-5">
-    <div class="row">
-      <div class="col-md-6 offset-md-3">
-        <div class="card">
-          <div class="card-header">
-            <h2 class="text-center">Drag and Drop PDF</h2>
-          </div>
-          <div class="card-body">
-            <form id="uploadForm" method="post" enctype="multipart/form-data">
-              {% csrf_token %}
-              <div class="form-group">
-                <label for="pdfFile">Drop PDF file here or click to upload</label>
-                <input type="file" class="form-control-file" id="pdfFile" name="pdf_file" accept=".pdf">
-              </div>
-              <button type="button" class="btn btn-primary btn-block" onclick="uploadPDF()">Upload</button>
-            </form>
-          </div>
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="text-center">Drag and Drop PDF</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="uploadForm" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="pdfFile">Drop PDF file here or click to upload</label>
+                                    <input type="file" class="form-control-file" id="pdfFile" name="pdf_file"
+                                           accept=".pdf">
+                                </div>
+                                <button type="button" class="btn btn-primary btn-block" onclick="uploadPDF()">Upload
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
 
     </div>
 {% endblock %}
 
 {% block extra_script %}
 
-<script>
-    function uploadPDF() {
-      var form = document.getElementById('uploadForm');
-      var fileInput = document.getElementById('pdfFile');
+    <script>
+        function uploadPDF() {
+            var form = document.getElementById('uploadForm');
+            var fileInput = document.getElementById('pdfFile');
 
-      if (fileInput.files.length > 0) {
-        form.submit();
-      } else {
-        alert('Please select a PDF file to upload.');
-      }
-    }
+            if (fileInput.files.length > 0) {
+                form.submit();
+            } else {
+                alert('Please select a PDF file to upload.');
+            }
+        }
 
-    document.addEventListener('DOMContentLoaded', function () {
-      var uploadForm = document.getElementById('uploadForm');
+        document.addEventListener('DOMContentLoaded' , function () {
+            var uploadForm = document.getElementById('uploadForm');
 
-      uploadForm.addEventListener('dragover', function (e) {
-        e.preventDefault();
-        uploadForm.classList.add('dragover');
-      });
+            uploadForm.addEventListener('dragover' , function (e) {
+                e.preventDefault();
+                uploadForm.classList.add('dragover');
+            });
 
-      uploadForm.addEventListener('dragleave', function () {
-        uploadForm.classList.remove('dragover');
-      });
+            uploadForm.addEventListener('dragleave' , function () {
+                uploadForm.classList.remove('dragover');
+            });
 
-      uploadForm.addEventListener('drop', function (e) {
-        e.preventDefault();
-        uploadForm.classList.remove('dragover');
-        var fileInput = document.getElementById('pdfFile');
-        fileInput.files = e.dataTransfer.files;
-        uploadPDF();
-      });
-    });
-  </script>
+            uploadForm.addEventListener('drop' , function (e) {
+                e.preventDefault();
+                uploadForm.classList.remove('dragover');
+                var fileInput = document.getElementById('pdfFile');
+                fileInput.files = e.dataTransfer.files;
+                uploadPDF();
+            });
+        });
+    </script>
 {% endblock %}

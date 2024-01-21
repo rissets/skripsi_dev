@@ -1,0 +1,99 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block extra_style %}
+<link rel="stylesheet" href="{% static "css/chat.css" %}">
+
+    <script src="{% static "js/icons.js" %}"></script>
+    <script src="{% static "js/chat-teachable.js" %}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@latest/dist/markdown-it.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@latest/build/styles/base16/dracula.min.css">
+    <script>
+        const user_image        = `<img src="{% static 'images/user.png' %}" alt="User Avatar">`;
+        const gpt_image         = `<img src="{% static 'images/gpt.jpg' %}" alt="GPT Avatar">`;
+        const teachable_agent      = `{{ teachable_agent }}`;
+
+    </script>
+    <style>
+        .hljs {
+            color: #e9e9f4;
+            background: #28293629;
+            border-radius: var(--border-radius-1);
+            border: 1px solid var(--blur-border);
+            font-size: 15px;
+        }
+
+        #message-input {
+            margin-right: 30px;
+            height: 80px;
+        }
+
+        #message-input::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        /* Track */
+        #message-input::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+
+        /* Handle */
+        #message-input::-webkit-scrollbar-thumb {
+            background: #c7a2ff;
+        }
+
+        /* Handle on hover */
+        #message-input::-webkit-scrollbar-thumb:hover {
+            background: #8b3dff;
+        }
+    </style>
+    <script src="{% static "js/highlight.min.js" %}"></script>
+    <script src="{% static "js/highlightjs-copy.min.js" %}"></script>
+    <script>window.conversation_id = `{{chat_id}}`</script>
+{% endblock %}
+
+{% block content %}
+    <div id="content" class="p-4 p-md-5 pt-5">
+        <div class="row">
+            <div class="col-lg-7 conversation disable-scrollbars border-right">
+
+                 <div class="bottom_buttons">
+                    <button onclick="delete_conversations()">
+                        <i class="fa-regular fa-trash"></i>
+                        <span>Clear Conversations</span>
+                    </button>
+                </div>
+                <div class="spinner"></div>
+                <div class="stop_generating stop_generating-hidden">
+                    <button id="cancelButton">
+                        <span>Stop Generating</span>
+                        <i class="fa-regular fa-stop"></i>
+                    </button>
+                </div>
+                <div class="box" id="messages">
+                </div>
+                <div class="user-input border-top">
+                    <div class="box input-box">
+                        <textarea id="message-input" placeholder="Ask a question" cols="30" rows="10" style="white-space: pre-wrap;" oninput="resizeTextarea(this)"></textarea>
+                        <div id="send-button">
+                            <i class="fa-regular fa-paper-plane-top"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-5" >
+                <h4>Teachable Agent QA</h4>
+               <div id="markdown-pdf"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+const md = window.markdownit()
+        document.getElementById('markdown-pdf').innerHTML = md.render(`{{ pdf.content }}`);
+</script>
+{% endblock %}

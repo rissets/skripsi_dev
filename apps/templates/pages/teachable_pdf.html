@@ -1,0 +1,123 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block extra_style %}
+<link rel="stylesheet" href="{% static "css/chat.css" %}">
+
+    <script src="{% static "js/icons.js" %}"></script>
+    <script src="{% static "js/chat-teachable-pdf.js" %}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@latest/dist/markdown-it.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@latest/build/styles/base16/dracula.min.css">
+    <script>
+        const user_image        = `<img src="{% static 'images/user.png' %}" alt="User Avatar">`;
+        const gpt_image         = `<img src="{% static 'images/gpt.jpg' %}" alt="GPT Avatar">`;
+        const teachable_agent      = `{{ teachable_agent }}`;
+
+
+    </script>
+    <style>
+        .hljs {
+            color: #e9e9f4;
+            background: #28293629;
+            border-radius: var(--border-radius-1);
+            border: 1px solid var(--blur-border);
+            font-size: 15px;
+        }
+
+        #message-input {
+            margin-right: 30px;
+            height: 80px;
+        }
+
+        #message-input::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        /* Track */
+        #message-input::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+
+        /* Handle */
+        #message-input::-webkit-scrollbar-thumb {
+            background: #c7a2ff;
+        }
+
+        /* Handle on hover */
+        #message-input::-webkit-scrollbar-thumb:hover {
+            background: #8b3dff;
+        }
+        /* Add this to your CSS file */
+        .overlay-loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+
+.notification-box {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px;
+  background: #2ecc71;
+  color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+    </style>
+    <script src="{% static "js/highlight.min.js" %}"></script>
+    <script src="{% static "js/highlightjs-copy.min.js" %}"></script>
+    <script>window.conversation_id = `{{chat_id}}`</script>
+{% endblock %}
+
+{% block content %}
+    <div id="content" class="p-4 p-md-5 pt-5">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-lg-7conversation disable-scrollbars">
+                <h2>Teachable Agent with PDF</h2>
+                <div id="notification-box" class="notification-box"></div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="pdf-select">Select PDF for training</label>
+                        <select class="form-control" id="pdf-select">
+                            <option value="0">Select PDF</option>
+                            {% for pdf in pdfs %}
+                                <option id="pdf{{ pdf.id }}" value="{{ pdf.id }}">{{ pdf.pdf_file }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-block" onclick="trainPDF()">Train
+                    </button>
+                </form>
+                <!-- Add this to your HTML file -->
+                <div id="overlay-loading" class="overlay-loading">
+                  <div class="d-flex justify-content-center" style="position: relative;top: 50%;">
+                    <div class="spinner-border" role="status" style="width: 5rem;height: 5rem">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_script %}
+
+<script>
+    // Initialize window.controller somewhere in your code
+
+
+</script>
+{% endblock %}
