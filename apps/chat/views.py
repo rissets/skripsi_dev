@@ -26,6 +26,12 @@ class TeachableView(View):
         return redirect('chat:teachable-agent')
 
 
+class TestTeachableView(View):
+    def get(self, request, *args, **kwargs):
+        agents = request.user.teachable_agents.all()
+        return render(request, "pages/test_teachable_agent.html", {'agents': agents})
+
+
 
 class ChatView(View):
     def get(self, request, *args, **kwargs):

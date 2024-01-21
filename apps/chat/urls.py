@@ -1,6 +1,7 @@
 from django.urls import path
 
-from .views import ChatView, ChatPDFView, RenderPDF, TeachableView, TeachableAgentView, CreateTeachableAgent
+from .views import ChatView, ChatPDFView, RenderPDF, TeachableView, TeachableAgentView, CreateTeachableAgent, \
+    TestTeachableView
 
 app_name = "chat"
 
@@ -11,4 +12,5 @@ urlpatterns = [
     path("teachable-agent/", TeachableAgentView.as_view(), name="teachable-agent"),
     path("create-teachable-agent/", CreateTeachableAgent.as_view(), name="create-teachable-agent"),
     path("teachable/<str:slug>/", TeachableView.as_view(), name="teachable"),
+    path("test-teachable-agent/", TestTeachableView.as_view(), name="test-teachable-agent"),
 ]

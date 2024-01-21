@@ -34,7 +34,7 @@ except ImportError:
 config_list=[
     {
         "model": "TheBloke_Magicoder-S-DS-6.7B-GPTQ_gptq-4bit-32g-actorder_True",
-        "base_url": "https://wiring-canadian-chart-theory.trycloudflare.com/v1",
+        "base_url": "https://supporters-notebook-uk-point.trycloudflare.com/v1",
         'api_key': 'any string here is fine',
         # 'api_type': 'openai',
     }

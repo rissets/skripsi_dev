@@ -184,7 +184,7 @@ class BackendApiTeachable(View):
     config_list = [
         {
             "model": "TheBloke_Magicoder-S-DS-6.7B-GPTQ_gptq-4bit-32g-actorder_True",
-            "base_url": "https://screens-dedicated-tub-wage.trycloudflare.com/v1",
+            "base_url": "https://supporters-notebook-uk-point.trycloudflare.com/v1",
             'api_key': 'any string here is fine',
             # 'api_type': 'openai',
         }
@@ -193,7 +193,6 @@ class BackendApiTeachable(View):
     llm_config = {
         "config_list": config_list,
         "temperature": 0.7,
-        "seed": 1117,
         "timeout": 120,
     }
 
@@ -225,7 +224,6 @@ class BackendApiTeachable(View):
         teachable_agent, teachability = self.create_teachable_agent(reset_db=False, verbosity=0, db_dir=db_dir)
         user = autogen.UserProxyAgent("user", human_input_mode="NEVER", max_consecutive_auto_reply=0,
                                       code_execution_config={"work_dir": "./tmp/notebook", "use_docker": False})
-        # teachability.prepopulate_db()
         teachable_agent.initiate_chat(user, message="Hi, I'm a teachable user assistant! What's on your mind?",
                                       clear_history=True)
 
@@ -299,6 +297,94 @@ class BackendApiTeachable(View):
                 return StreamingHttpResponse(stream(), content_type='text/event-stream')
 
 
+
+        except Exception as e:
+            print(e)
+            print(e.__traceback__.tb_next)
+            return JsonResponse({
+                '_action': '_ask',
+                'success': False,
+                "error": f"an error occurred {str(e)}"
+            }, status=400)
+
+
+class BackendApiTestTeachable(View):
+    config_list = [
+        {
+            "model": "TheBloke_Magicoder-S-DS-6.7B-GPTQ_gptq-4bit-32g-actorder_True",
+            "base_url": "https://supporters-notebook-uk-point.trycloudflare.com/v1",
+            'api_key': 'any string here is fine',
+            # 'api_type': 'openai',
+        }
+    ]
+
+    llm_config = {
+        "config_list": config_list,
+        "temperature": 0.7,
+        "seed": 1117,
+        "timeout": 120,
+    }
+
+    def create_teachable_agent(self, reset_db=False, verbosity=0, db_dir=None):
+
+        # Start by instantiating any agent that inherits from ConversableAgent.
+        teachable_agent = autogen.ConversableAgent(
+            name="teachable_agent",
+            llm_config={"config_list": self.config_list, "timeout": 120, "cache_seed": None},  # Disable caching.
+        )
+
+        # Instantiate the Teachability capability. Its parameters are all optional.
+        teachability = Teachability(
+            verbosity=verbosity,
+            reset_db=reset_db,
+            path_to_db_dir=f"./tmp/{db_dir}/teachability_db",
+            recall_threshold=0.5,  # Higher numbers allow more (but less relevant) memos to be recalled.
+        )
+
+        # Now add the Teachability capability to the agent.
+        teachability.add_to_agent(teachable_agent)
+
+        return teachable_agent, teachability
+
+    def interact_freely_with_agent(self, message, db_dir):
+        """Starts a free-form chat between the user and a teachable agent."""
+
+        # Create the agents.
+        teachable_agent, teachability = self.create_teachable_agent(reset_db=False, verbosity=0, db_dir=db_dir)
+        user = autogen.UserProxyAgent("user", human_input_mode="NEVER", max_consecutive_auto_reply=0,
+                                      code_execution_config={"work_dir": "./tmp/notebook", "use_docker": False})
+        # teachability.prepopulate_db()
+        #
+
+        # Start the chat.
+        user.initiate_chat(teachable_agent, message=message, clear_history=True)
+
+        response = user.last_message(teachable_agent)
+        return response
+
+
+    @method_decorator(csrf_exempt)
+    @method_decorator(require_POST)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            json_data = loads(request.body)
+            # _conversation = json_data['meta']['content']['conversation']
+            prompt = json_data['meta']['content']['parts'][0]['content']
+            agent_slug = json_data['agent_slug']
+
+            print(agent_slug)
+            conversation = prompt
+            response = self.interact_freely_with_agent(conversation, db_dir=agent_slug)
+
+            def stream():
+                # respon kata perkata
+                for chunk in response['content']:
+                    yield chunk
+
+            return StreamingHttpResponse(stream(), content_type='text/event-stream')
 
         except Exception as e:
             print(e)
