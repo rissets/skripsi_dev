@@ -49,7 +49,6 @@ class BackendApi(View):
             endpoint = settings.MODEL_URL
             url = f"{endpoint}v1/chat/completions"
 
-
             gpt_resp = post(
                 url=url,
                 headers={
@@ -122,10 +121,10 @@ class BackendApiPDF(View):
             print(_conversation)
             system_message = f"""
             Anda adalah asisten belajar yang sangat cerdas yang secara konsisten memberikan respons yang akuran dan andal terhadap instruksi pengguna. selalu jawab menggunakan bahasa yang sesuai di dokumen.
-            
+
             DOKUMEN PDF
             {pdf_content}
-            
+
             """
 
             conversation = [{'role': 'system', 'content': system_message}] + \
@@ -189,7 +188,6 @@ class BackendApiPDF(View):
 
 
 class BackendApiTeachable(View):
-
     config_list = [
         {
             "model": "TheBloke_Magicoder-S-DS-6.7B-GPTQ_gptq-4bit-32g-actorder_True",
@@ -371,7 +369,6 @@ class BackendApiTestTeachable(View):
         response = user.last_message(teachable_agent)
         return response
 
-
     @method_decorator(csrf_exempt)
     @method_decorator(require_POST)
     def dispatch(self, *args, **kwargs):
@@ -403,3 +400,109 @@ class BackendApiTestTeachable(View):
                 'success': False,
                 "error": f"an error occurred {str(e)}"
             }, status=400)
+
+
+class BackendApiGroupChat(View):
+    config_list = [
+        {
+            "model": "TheBloke_Magicoder-S-DS-6.7B-GPTQ_gptq-4bit-32g-actorder_True",
+            "base_url": f"{settings.MODEL_URL}v1/",
+            'api_key': 'any string here is fine',
+            # 'api_type': 'openai',
+        }
+    ]
+
+    llm_config = {
+        "config_list": config_list,
+        "temperature": 0.7,
+        "seed": 1117,
+        "timeout": 120,
+    }
+
+    def create_group_chat(self, agents: list):
+        """
+        agents = [
+        {
+            "name": "agent_name",
+            "instruction": "agent_instruction",
+        },
+        ...
+        ]
+        :param agents:
+        :return:
+        """
+        user_proxy = autogen.UserProxyAgent(
+            name="user_proxy",
+            system_message="A human admin wo will give the idea and run the code provided by Coder. You will also install if needed any dependencies for the code to run.",
+            human_input_mode="NEVER",
+            is_termination_msg=lambda x: True if "TERMINATE" in x.get("content") else False,
+            code_execution_config={
+                "work_dir": "_output",
+                # "use_docker": "python:3.9"
+                "use_docker": False,
+            },
+        )
+
+        agents_list = []
+        for agent in agents:
+            agents_list.append(autogen.AssistantAgent(
+                name=agent['name'],
+                system_message=agent['instruction'],
+                llm_config=self.llm_config,
+            ))
+
+        group_chat = autogen.GroupChat(agents=[user_proxy] + agents_list, messages=[], max_round=len(agents_list) * 2)
+
+        return group_chat
+
+    def initiate_chat(self, group_chat, message):
+        manager = autogen.GroupChatManager(groupchat=group_chat, llm_config=self.llm_config)
+        manager.initiate_chat(manager, message=message, clear_history=True, config_list=self.config_list)
+
+        return manager
+
+    @method_decorator(csrf_exempt)
+    @method_decorator(require_POST)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            json_data = loads(request.body)
+            # _conversation = json_data['meta']['content']['conversation']
+            prompt = json_data['meta']['content']['parts'][0]['content']
+            groupChat = json_data['groupChat']
+
+            print(groupChat)
+
+            group_chat = self.request.user.group_chats.get(slug=groupChat)
+            agents = []
+            for agent in group_chat.agents.all():
+                agents.append({
+                    "name": agent.name,
+                    "instruction": agent.instruction,
+                })
+
+            group_chat = self.create_group_chat(agents=agents)
+            manager = self.initiate_chat(group_chat, message=prompt)
+
+            response = manager.last_message(manager)
+
+            def stream():
+                # respon kata perkata
+                for chunk in manager.last_message(manager)['content']:
+                    yield chunk
+
+            return StreamingHttpResponse(stream(), content_type='text/event-stream')
+
+        except Exception as e:
+            print(e)
+            print(e.__traceback__.tb_next)
+            return JsonResponse({
+                '_action': '_ask',
+                'success': False,
+                "error": f"an error occurred {str(e)}"
+            }, status=400)
+
+
+

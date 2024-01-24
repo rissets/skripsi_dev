@@ -53,3 +53,43 @@ class TeachableAgent(models.Model):
     def save(self, *args, **kwargs):
         self.slug = self.name.lower().replace(' ', '-')
         super().save(*args, **kwargs)
+
+
+class GroupChat(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_chats')
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.pk}. {self.name}"
+
+    def get_absolute_url(self):
+        return reverse('group_chat_detail', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        self.slug = self.name.lower().replace(' ', '-')
+        super().save(*args, **kwargs)
+
+
+class Agent(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='agents')
+    name = models.CharField(max_length=255)
+    instruction = models.TextField(blank=True, null=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
+    group_chat = models.ForeignKey(GroupChat, on_delete=models.CASCADE, related_name='agents')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.pk}. {self.name}"
+
+    # def get_absolute_url(self):
+    #     return reverse('agent_detail', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        self.slug = self.name.lower().replace(' ', '-')
+        super().save(*args, **kwargs)

@@ -135,4 +135,4 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MODEL_URL="https://making-durable-album-cognitive.trycloudflare.com/"
+MODEL_URL="https://mario-arising-bald-partially.trycloudflare.com/"

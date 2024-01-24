@@ -1,0 +1,49 @@
+{% extends "pages/base.html" %}
+{% load filename %}
+
+
+{% block content %}
+    <div id="content" class="p-4 p-md-5 pt-5">
+        <h2 class="mb-4">My Group Chat</h2>
+        <div class="container">
+            {% if group_chats %}
+            <div class="row">
+                <div class="col-12">
+                    <a href="{% url "chat:create-group-chat" %}" class="btn btn-primary mb-3"><i class="fa fa-plus"></i> Create Group Chat</a>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Agents</th>
+                            <th scope="col">Created At</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for gc in group_chats %}
+                        <tr>
+                            <th scope="row">{{ gc.id }}</th>
+                            <td>{{ gc.name|truncatewords:5 }}</td>
+                            <td>{{ gc.agents.count }}</td>
+                            <td>{{ gc.created_at }}</td>
+                            <td>
+                                <a href="{% url "chat:agent" gc.slug %}" class="btn btn-primary"><i class="fa fa-eye"></i></a>
+                                <a href="" class="btn btn-danger"><i class="fa fa-trash-o"></i></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+                {% else %}
+                <div class="row">
+                    <div class="col-12">
+                        <p>No group chat found.</p>
+                    <a href="{% url "chat:create-group-chat" %}" class="btn btn-primary"><i class="fa fa-plus"></i> Create Group Chat</a>
+                    </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

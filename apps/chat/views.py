@@ -1,3 +1,5 @@
+import json
+
 import PyPDF2
 from django.http import JsonResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -10,7 +12,7 @@ from requests import get, post
 from json import loads
 
 from .config import special_instructions
-from .forms import PDFForm, TeachableAgentForm
+from .forms import PDFForm, TeachableAgentForm, GroupChatForm, AgentForm
 from .models import PDF
 
 
@@ -134,3 +136,126 @@ class ChatPDFListView(View):
     def get(self, request, *args, **kwargs):
         pdfs = request.user.pdfs.all()
         return render(request, "pages/chat-pdfs.html", {'pdfs': pdfs})
+
+
+class ChatPDFDeleteView(View):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        pdf = request.user.pdfs.get(pk=pk)
+        pdf.delete()
+        return redirect('chat:pdfs')
+
+
+class GroupChatListView(View):
+    def get(self, request, *args, **kwargs):
+        group_chats = request.user.group_chats.all()
+        return render(request, "pages/groupchats.html", {'group_chats': group_chats})
+
+
+class GroupChatCreateView(View):
+    template_name = "pages/groupchat-create.html"
+    form = GroupChatForm
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, {'form': self.form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form(request.POST)
+        if form.is_valid():
+            group_chat = form.save(commit=False)
+            group_chat.user = request.user
+            group_chat.save()
+            return redirect('chat:group-chat')
+        return render(request, self.template_name, {'form': form})
+
+
+class AgentView(View):
+    def get(self, request, *args, **kwargs):
+        group_chats = request.user.group_chats.get(slug=kwargs.get('slug'))
+        agents = group_chats.agents.all()
+
+        return render(request, "pages/agents.html", {'agents': agents, 'group_chat': group_chats})
+
+
+class AgentCreateView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(AgentCreateView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            try:
+                data = loads(request.body)
+                agent_name = data['name']
+                agent_instruction = data['instruction']
+                group_chat_id = data['group_chat_id']
+
+                form = AgentForm({'name': agent_name, 'instruction': agent_instruction})
+                group_chat = request.user.group_chats.get(pk=group_chat_id)
+
+                if form.is_valid():
+                    agent = form.save(commit=False)
+                    agent.user = request.user
+                    agent.group_chat = group_chat
+                    agent.save()
+
+                    response_data = {
+                        'status': 'success',
+                        'message': 'Agent created successfully',
+                        'agent_name': agent.name,
+                        'agent_slug': agent.slug,
+                        'agent_instruction': agent.instruction,
+                    }
+                    return JsonResponse(response_data)
+                else:
+                    response_data = {
+                        'status': 'error',
+                        'message': 'Form is invalid'
+                    }
+                    return JsonResponse(response_data)
+
+            except json.JSONDecodeError as e:
+                response_data = {
+                    'status': 'error',
+                    'message': 'Invalid JSON format'
+                }
+                return JsonResponse(response_data)
+
+        else:
+            response_data = {
+                'status': 'error',
+                'message': 'Invalid request method'
+            }
+            return JsonResponse(response_data)
+
+
+class AgentDeleteView(View):
+    def get(self, request, *args, **kwargs):
+        slug = kwargs.get('slug')
+        agent = request.user.agents.get(slug=slug)
+        slug = agent.group_chat.slug
+        agent.delete()
+        return redirect("chat:agent", slug=slug)
+
+
+class AgentUpdateView(View):
+    template_name = "pages/agent-update.html"
+    form = AgentForm
+
+    def get(self, request, *args, **kwargs):
+        agent = request.user.agents.get(slug=kwargs.get('slug'))
+        return render(request, self.template_name, {'form': self.form(instance=agent)})
+
+    def post(self, request, *args, **kwargs):
+        agent = request.user.agents.get(slug=kwargs.get('slug'))
+        form = self.form(request.POST, instance=agent)
+        if form.is_valid():
+            form.save()
+            return redirect("chat:agent", slug=agent.group_chat.slug)
+        return render(request, self.template_name, {'form': form})
+
+
+class GroupChatView(View):
+    def get(self, request, *args, **kwargs):
+        group_chats = request.user.group_chats.all()
+        return render(request, "pages/group_chat.html", {'group_chats': group_chats})
