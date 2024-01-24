@@ -1,22 +1,18 @@
 import json
-
+from json import loads
 import PyPDF2
-from django.http import JsonResponse, StreamingHttpResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
 from django.shortcuts import render, redirect
 from django.views import View
-from datetime import datetime
-from requests import get, post
-from json import loads
 
-from .config import special_instructions
 from .forms import PDFForm, TeachableAgentForm, GroupChatForm, AgentForm
 from .models import PDF
 
 
-class TeachableView(View):
+class TeachableView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         agent = request.user.teachable_agents.get(slug=slug)
@@ -28,13 +24,13 @@ class TeachableView(View):
         return redirect('chat:teachable-agent')
 
 
-class TestTeachableView(View):
+class TestTeachableView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         agents = request.user.teachable_agents.all()
         return render(request, "pages/test_teachable_agent.html", {'agents': agents})
 
 
-class CreateTeachableAgent(View):
+class CreateTeachableAgent(LoginRequiredMixin, View):
     template_name = "pages/create-teachable-agent.html"
     form = TeachableAgentForm
     def get(self, request, *args, **kwargs):
@@ -50,13 +46,13 @@ class CreateTeachableAgent(View):
         return render(request, self.template_name, {'form': form})
 
 
-class TeachableAgentView(View):
+class TeachableAgentView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         agents = request.user.teachable_agents.all()
         return render(request, "pages/teachable_agents.html", {'agents': agents})
 
 
-class TeachableAgentDeleteView(View):
+class TeachableAgentDeleteView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         agent = request.user.teachable_agents.get(slug=slug)
@@ -67,7 +63,7 @@ class TeachableAgentDeleteView(View):
         return redirect('chat:teachable-agent')
 
 
-class ChatView(View):
+class ChatView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return render(request, "pages/chat.html")
 
@@ -88,7 +84,7 @@ def read_pdf(pdf_file):
     return pdf_text, count_words, num_pages
 
 
-class UploadPDFView(View):
+class UploadPDFView(LoginRequiredMixin, View):
     template_name = "pages/chat-pdf.html"
 
     def get(self, request, *args, **kwargs):
@@ -126,19 +122,19 @@ class UploadPDFView(View):
         return render(request, self.template_name, {'form': form})
 
 
-class RenderPDF(View):
+class RenderPDF(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         pdf = PDF.objects.get(pk=kwargs['pk'])
         return render(request, 'pages/render-pdf.html', {'pdf': pdf})
 
 
-class ChatPDFListView(View):
+class ChatPDFListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         pdfs = request.user.pdfs.all()
         return render(request, "pages/chat-pdfs.html", {'pdfs': pdfs})
 
 
-class ChatPDFDeleteView(View):
+class ChatPDFDeleteView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
         pdf = request.user.pdfs.get(pk=pk)
@@ -146,13 +142,13 @@ class ChatPDFDeleteView(View):
         return redirect('chat:pdfs')
 
 
-class GroupChatListView(View):
+class GroupChatListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         group_chats = request.user.group_chats.all()
         return render(request, "pages/groupchats.html", {'group_chats': group_chats})
 
 
-class GroupChatCreateView(View):
+class GroupChatCreateView(LoginRequiredMixin, View):
     template_name = "pages/groupchat-create.html"
     form = GroupChatForm
 
@@ -169,7 +165,7 @@ class GroupChatCreateView(View):
         return render(request, self.template_name, {'form': form})
 
 
-class AgentView(View):
+class AgentView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         group_chats = request.user.group_chats.get(slug=kwargs.get('slug'))
         agents = group_chats.agents.all()
@@ -177,7 +173,7 @@ class AgentView(View):
         return render(request, "pages/agents.html", {'agents': agents, 'group_chat': group_chats})
 
 
-class AgentCreateView(View):
+class AgentCreateView(LoginRequiredMixin, View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(AgentCreateView, self).dispatch(request, *args, **kwargs)
@@ -229,7 +225,7 @@ class AgentCreateView(View):
             return JsonResponse(response_data)
 
 
-class AgentDeleteView(View):
+class AgentDeleteView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         agent = request.user.agents.get(slug=slug)
@@ -238,7 +234,7 @@ class AgentDeleteView(View):
         return redirect("chat:agent", slug=slug)
 
 
-class AgentUpdateView(View):
+class AgentUpdateView(LoginRequiredMixin, View):
     template_name = "pages/agent-update.html"
     form = AgentForm
 
@@ -255,7 +251,7 @@ class AgentUpdateView(View):
         return render(request, self.template_name, {'form': form})
 
 
-class GroupChatView(View):
+class GroupChatView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         group_chats = request.user.group_chats.all()
         return render(request, "pages/group_chat.html", {'group_chats': group_chats})

@@ -8,6 +8,7 @@ from .views import DashboardView
 
 urlpatterns = [
     path("", DashboardView.as_view(), name="dashboard"),
+    path("accounts/", include("accounts.urls", namespace="accounts")),
     path("admin/", admin.site.urls),
     path("chat/", include("chat.urls", namespace="chat")),
     path("api/", include("chat.api.urls", namespace="chat-api")),

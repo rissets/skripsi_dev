@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "rest_framework",
 
     "chat",
+    "accounts",
 
 ]
 
@@ -136,3 +137,17 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MODEL_URL="https://mario-arising-bald-partially.trycloudflare.com/"
+
+
+# email settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# cross origin settings
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:8000',
+    'http://localhost:3000',
+]
+
+# AUTH_USER_MODEL = 'accounts.User'
