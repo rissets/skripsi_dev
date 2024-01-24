@@ -35,13 +35,20 @@ class BackendApi(View):
             json_data = loads(request.body)
             _conversation = json_data['meta']['content']['conversation']
             prompt = json_data['meta']['content']['parts'][0]
+            chat_mode = json_data['chat_mode']
+            print(chat_mode)
             current_date = datetime.now().strftime("%Y-%m-%d")
-            system_message = 'Anda adalah asisten pengkodean yang sangat cerdas yang secara konsisten memberikan respons yang akurat dan andal terhadap instruksi pengguna. selalu jawab menggunakan bahasa indonesia.'
+            if chat_mode == 'general':
+                system_message = f'You are an exceptionally intelligent {chat_mode} coding assistant that consistently delivers accurate and reliable responses to user instructions.'
+            else:
+                system_message = f'You are an exceptionally intelligent {chat_mode} coding assistant that consistently delivers accurate and reliable responses to user instructions.'
 
             conversation = [{'role': 'system', 'content': system_message}] + \
                            _conversation + [prompt]
 
-            url = settings.MODEL_URL
+            endpoint = settings.MODEL_URL
+            url = f"{endpoint}v1/chat/completions"
+
 
             gpt_resp = post(
                 url=url,
@@ -124,7 +131,8 @@ class BackendApiPDF(View):
             conversation = [{'role': 'system', 'content': system_message}] + \
                            _conversation + [prompt]
 
-            url = settings.MODEL_URL
+            endpoint = settings.MODEL_URL
+            url = f"{endpoint}v1/chat/completions"
 
             gpt_resp = post(
                 url=url,
@@ -181,10 +189,11 @@ class BackendApiPDF(View):
 
 
 class BackendApiTeachable(View):
+
     config_list = [
         {
             "model": "TheBloke_Magicoder-S-DS-6.7B-GPTQ_gptq-4bit-32g-actorder_True",
-            "base_url": "https://supporters-notebook-uk-point.trycloudflare.com/v1",
+            "base_url": f"{settings.MODEL_URL}v1/",
             'api_key': 'any string here is fine',
             # 'api_type': 'openai',
         }
@@ -312,7 +321,7 @@ class BackendApiTestTeachable(View):
     config_list = [
         {
             "model": "TheBloke_Magicoder-S-DS-6.7B-GPTQ_gptq-4bit-32g-actorder_True",
-            "base_url": "https://supporters-notebook-uk-point.trycloudflare.com/v1",
+            "base_url": f"{settings.MODEL_URL}v1/",
             'api_key': 'any string here is fine',
             # 'api_type': 'openai',
         }

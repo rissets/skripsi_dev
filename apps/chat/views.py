@@ -32,6 +32,38 @@ class TestTeachableView(View):
         return render(request, "pages/test_teachable_agent.html", {'agents': agents})
 
 
+class CreateTeachableAgent(View):
+    template_name = "pages/create-teachable-agent.html"
+    form = TeachableAgentForm
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, {'form': self.form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form(request.POST)
+        if form.is_valid():
+            teachable_agent = form.save(commit=False)
+            teachable_agent.user = request.user
+            teachable_agent.save()
+            return redirect('chat:teachable-agent')
+        return render(request, self.template_name, {'form': form})
+
+
+class TeachableAgentView(View):
+    def get(self, request, *args, **kwargs):
+        agents = request.user.teachable_agents.all()
+        return render(request, "pages/teachable_agents.html", {'agents': agents})
+
+
+class TeachableAgentDeleteView(View):
+    def get(self, request, *args, **kwargs):
+        slug = kwargs.get('slug')
+        agent = request.user.teachable_agents.get(slug=slug)
+        agent.delete()
+        # delete folder tmp/<slug>
+        import os
+        os.system(f"rm -rf tmp/{slug}")
+        return redirect('chat:teachable-agent')
+
 
 class ChatView(View):
     def get(self, request, *args, **kwargs):
@@ -54,7 +86,7 @@ def read_pdf(pdf_file):
     return pdf_text, count_words, num_pages
 
 
-class ChatPDFView(View):
+class UploadPDFView(View):
     template_name = "pages/chat-pdf.html"
 
     def get(self, request, *args, **kwargs):
@@ -74,6 +106,7 @@ class ChatPDFView(View):
                 return render(request, self.template_name, {'form': form})
 
         if form.is_valid():
+            form.instance.user = request.user
             uploaded_pdf = form.save()
 
             # Read the content of the PDF file
@@ -86,7 +119,7 @@ class ChatPDFView(View):
             uploaded_pdf.save()
 
             # Do something with the PDF content (e.g., display it in the template)
-            return redirect('chat:render-pdf', pk=uploaded_pdf.pk)
+            return redirect('chat:pdfs')
 
         return render(request, self.template_name, {'form': form})
 
@@ -97,23 +130,7 @@ class RenderPDF(View):
         return render(request, 'pages/render-pdf.html', {'pdf': pdf})
 
 
-class CreateTeachableAgent(View):
-    template_name = "pages/create-teachable-agent.html"
-    form = TeachableAgentForm
+class ChatPDFListView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'form': self.form})
-
-    def post(self, request, *args, **kwargs):
-        form = self.form(request.POST)
-        if form.is_valid():
-            teachable_agent = form.save(commit=False)
-            teachable_agent.user = request.user
-            teachable_agent.save()
-            return redirect('chat:teachable-agent')
-        return render(request, self.template_name, {'form': form})
-
-
-class TeachableAgentView(View):
-    def get(self, request, *args, **kwargs):
-        agents = request.user.teachable_agents.all()
-        return render(request, "pages/teachable_agents.html", {'agents': agents})
+        pdfs = request.user.pdfs.all()
+        return render(request, "pages/chat-pdfs.html", {'pdfs': pdfs})

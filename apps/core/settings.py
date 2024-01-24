@@ -135,4 +135,4 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MODEL_URL="https://buys-corrections-approx-defend.trycloudflare.com/v1/chat/completions"
+MODEL_URL="https://making-durable-album-cognitive.trycloudflare.com/"

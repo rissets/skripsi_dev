@@ -9,16 +9,25 @@ class Chat(models.Model):
 
 class PDF(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pdfs')
+    name = models.CharField(max_length=255)
     pdf_file = models.FileField(upload_to='pdfs/')
     content = models.TextField(blank=True, null=True)
     num_pages = models.IntegerField(blank=True, null=True)
     count_words = models.IntegerField(blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
-        return f"{self.pk}. {self.pdf_file.name}"
+        return f"{self.pk}. {self.name}"
 
+    def save(self, *args, **kwargs):
+        # hilangkan tanda _, -, dan spasi
+        self.name = self.pdf_file.name.replace('_', ' ').replace('-', ' ').replace('.pdf', '')
+        self.name = self.name.replace('pdfs/', '').replace('.pdf', '')
+        super().save(*args, **kwargs)
 
 class TeachableAgent(models.Model):
     MODE_CHOICES = (

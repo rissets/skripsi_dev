@@ -1,0 +1,51 @@
+{% extends "pages/base.html" %}
+{% load filename %}
+
+
+{% block content %}
+    <div id="content" class="p-4 p-md-5 pt-5">
+        <h2 class="mb-4">My PDFs</h2>
+        <div class="container">
+            {% if pdfs %}
+            <div class="row">
+                <div class="col-12">
+                    <a href="{% url "chat:upload-pdf" %}" class="btn btn-primary mb-3"><i class="fa fa-plus"></i> Upload PDF</a>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Pdf</th>
+                            <th scope="col">Num Pages</th>
+                            <th scope="col">Words</th>
+                            <th scope="col">Created At</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for pdf in pdfs %}
+                        <tr>
+                            <th scope="row">{{ pdf.id }}</th>
+                            <td>{{ pdf.name|truncatewords:5 }}</td>
+                            <td>{{ pdf.num_pages }}</td>
+                            <td>{{ pdf.count_words }}</td>
+                            <td>{{ pdf.created_at }}</td>
+                            <td>
+                                <a href="{% url "chat:chat-pdf" pdf.id %}" class="btn btn-primary"><i class="fa fa-eye"></i></a>
+                                <a href="" class="btn btn-danger"><i class="fa fa-trash-o"></i></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+                {% else %}
+                <div class="row">
+                    <div class="col-12">
+                        <p>No pdf found.</p>
+                    <a href="{% url "chat:upload-pdf" %}" class="btn btn-primary"><i class="fa fa-plus"></i> Upload PDF</a>
+                    </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

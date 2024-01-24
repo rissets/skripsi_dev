@@ -68,7 +68,7 @@ const ask_gpt = async (message) => {
     window.scrollTo(0, 0);
     window.controller = new AbortController();
 
-    jailbreak = document.getElementById("jailbreak");
+    chat_mode = document.getElementById("chat_mode");
     model = document.getElementById("model");
     prompt_lock = true;
     window.text = ``;
@@ -122,7 +122,7 @@ const ask_gpt = async (message) => {
         conversation_id: window.conversation_id,
         action: `_ask`,
         // model: model.options[model.selectedIndex].value,
-        // jailbreak: jailbreak.options[jailbreak.selectedIndex].value,
+        chat_mode: chat_mode.options[chat_mode.selectedIndex].value,
         meta: {
           id: window.token,
           content: {
@@ -497,43 +497,37 @@ document.querySelector(".mobile-sidebar").addEventListener("click", (event) => {
   window.scrollTo(0, 0);
 });
 
-// const register_settings_localstorage = async () => {
-//   settings_ids = ["switch", "model", "jailbreak"];
-//   settings_elements = settings_ids.map((id) => document.getElementById(id));
-//   settings_elements.map((element) =>
-//     element.addEventListener(`change`, async (event) => {
-//       switch (event.target.type) {
-//         case "checkbox":
-//           localStorage.setItem(event.target.id, event.target.checked);
-//           break;
-//         case "select-one":
-//           localStorage.setItem(event.target.id, event.target.selectedIndex);
-//           break;
-//         default:
-//           console.warn("Unresolved element type");
-//       }
-//     })
-//   );
-// };
+const register_settings_localstorage = async () => {
+  settings_ids = ["chat_mode"];
+  settings_elements = settings_ids.map((id) => document.getElementById(id));
+  settings_elements.map((element) =>
+    element.addEventListener(`change`, async (event) => {
+      switch (event.target.type) {
+        case "select-one":
+          localStorage.setItem(event.target.id, event.target.selectedIndex);
+          break;
+        default:
+          console.warn("Unresolved element type");
+      }
+    })
+  );
+};
 
-// const load_settings_localstorage = async () => {
-//   settings_ids = ["switch", "model", "jailbreak"];
-//   settings_elements = settings_ids.map((id) => document.getElementById(id));
-//   settings_elements.map((element) => {
-//     if (localStorage.getItem(element.id)) {
-//       switch (element.type) {
-//         case "checkbox":
-//           element.checked = localStorage.getItem(element.id) === "true";
-//           break;
-//         case "select-one":
-//           element.selectedIndex = parseInt(localStorage.getItem(element.id));
-//           break;
-//         default:
-//           console.warn("Unresolved element type");
-//       }
-//     }
-//   });
-// };
+const load_settings_localstorage = async () => {
+  settings_ids = ["chat_mode"];
+  settings_elements = settings_ids.map((id) => document.getElementById(id));
+  settings_elements.map((element) => {
+    if (localStorage.getItem(element.id)) {
+      switch (element.type) {
+        case "select-one":
+          element.selectedIndex = parseInt(localStorage.getItem(element.id));
+          break;
+        default:
+          console.warn("Unresolved element type");
+      }
+    }
+  });
+};
 
 // Theme storage for recurring viewers
 const storeTheme = function (theme) {

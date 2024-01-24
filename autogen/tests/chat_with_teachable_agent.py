@@ -57,6 +57,7 @@ def create_teachable_agent(reset_db=False, verbosity=0):
 
     # Now add the Teachability capability to the agent.
     teachability.add_to_agent(teachable_agent)
+    teachability.recall_threshold
 
     return teachable_agent, teachability
 
