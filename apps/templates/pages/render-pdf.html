@@ -7,7 +7,7 @@
     <script src="{% static "js/icons.js" %}"></script>
     <script src="{% static "js/chat-pdf.js" %}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@latest/dist/markdown-it.min.js"></script>
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@latest/build/styles/base16/dracula.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/base16/onedark.min.css">
     <script>
         const user_image        = `<img src="{% static 'images/user.png' %}" alt="User Avatar">`;
         const gpt_image         = `<img src="{% static 'images/gpt.jpg' %}" alt="GPT Avatar">`;
@@ -16,10 +16,8 @@
     </script>
     <style>
         .hljs {
-            color: #e9e9f4;
-            background: #28293629;
-            border-radius: var(--border-radius-1);
-            border: 1px solid var(--blur-border);
+            border-radius: 15px;
+            border: 1px solid #152733;
             font-size: 15px;
         }
 
@@ -54,13 +52,13 @@
 {% endblock %}
 
 {% block content %}
-    <div id="content" class="p-4 p-md-5 pt-5">
+    <div id="content" class="pl-4 pr-4 pl-md-3 pr-md-3 mb-0">
         <div class="row">
-            <div class="col-lg-7 conversation disable-scrollbars border-right">
+            <div class="col-lg-7 pl-5 pt-4 pr-4 conversation disable-scrollbars" style="border-right: 2px solid #152733;">
                 <h4>PDF Viewer</h4>
                 <div id="markdown-pdf"></div>
             </div>
-            <div class="col-lg-5 conversation disable-scrollbars " >
+            <div class="col-lg-5 conversation disable-scrollbars pt-4" >
                 <div class="bottom_buttons">
                     <button onclick="delete_conversations()">
                         <i class="fa-regular fa-trash"></i>
@@ -74,7 +72,7 @@
                         <i class="fa-regular fa-stop"></i>
                     </button>
                 </div>
-                <div class="box" id="messages">
+                <div class="box pt-4" id="messages">
                 </div>
                 <div class="user-input border-top">
                     <div class="box input-box">

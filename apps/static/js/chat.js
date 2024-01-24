@@ -483,20 +483,6 @@ message_input.addEventListener(`keydown`, async (evt) => {
   // register_settings_localstorage();
 };
 
-document.querySelector(".mobile-sidebar").addEventListener("click", (event) => {
-  const sidebar = document.querySelector(".conversations");
-
-  if (sidebar.classList.contains("shown")) {
-    sidebar.classList.remove("shown");
-    event.target.classList.remove("rotated");
-  } else {
-    sidebar.classList.add("shown");
-    event.target.classList.add("rotated");
-  }
-
-  window.scrollTo(0, 0);
-});
-
 const register_settings_localstorage = async () => {
   settings_ids = ["chat_mode"];
   settings_elements = settings_ids.map((id) => document.getElementById(id));

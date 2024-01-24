@@ -7,7 +7,7 @@
     <script src="{% static "js/icons.js" %}"></script>
     <script src="{% static "js/chat-teachable.js" %}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@latest/dist/markdown-it.min.js"></script>
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@latest/build/styles/base16/dracula.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/base16/onedark.min.css">
     <script>
         const user_image        = `<img src="{% static 'images/user.png' %}" alt="User Avatar">`;
         const gpt_image         = `<img src="{% static 'images/gpt.jpg' %}" alt="GPT Avatar">`;
@@ -16,10 +16,8 @@
     </script>
     <style>
         .hljs {
-            color: #e9e9f4;
-            background: #28293629;
-            border-radius: var(--border-radius-1);
-            border: 1px solid var(--blur-border);
+            border-radius: 15px;
+            border: 1px solid #152733;
             font-size: 15px;
         }
 
@@ -54,9 +52,9 @@
 {% endblock %}
 
 {% block content %}
-    <div id="content" class="p-4 p-md-5 pt-5">
+    <div id="content" class="pl-4 pr-4 pl-md-3 pr-md-3 mb-0">
         <div class="row">
-            <div class="col-lg-7 conversation disable-scrollbars border-right">
+            <div class="col-lg-7 conversation disable-scrollbars pr-4 pl-4 pt-4" style="border-right: 2px solid #152733;">
 
                  <div class="bottom_buttons">
                     <button onclick="delete_conversations()">
@@ -83,8 +81,8 @@
                 </div>
 
             </div>
-            <div class="col-lg-5" >
-                <h4>Teachable Agent QA</h4>
+            <div class="col-lg-5 pt-4">
+                <h4 class="pl-3">Teachable Agent QA</h4>
                <div id="markdown-pdf"></div>
             </div>
         </div>

@@ -25,6 +25,55 @@
             right: 10px;
             cursor: pointer;
         }
+        .card {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bayangan tipis */
+      border-radius: 15px; /* Sudut bulat */
+      transition: box-shadow 0.3s ease; /* Efek transisi untuk bayangan */
+    }
+
+    .card:hover {
+        transform: scale(1.02);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Bayangan sedikit lebih tebal saat dihover */
+    }
+
+    .card-title {
+      font-weight: bold;
+      color: #333; /* Warna teks sesuai kebutuhan */
+    }
+
+    .card-text {
+      font-weight: 500;
+      color: #666; /* Warna teks sesuai kebutuhan */
+    }
+
+    .card img {
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+      object-fit: cover;
+      height: 200px; /* Sesuaikan tinggi gambar sesuai kebutuhan */
+    }
+
+    #content {
+      background-color: #f8f9fa; /* Warna latar belakang sesuai kebutuhan */
+      padding: 4rem;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .col-md-6 {
+      flex: 0 0 calc(50% - 1rem);
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .col-md-6 {
+        flex: 0 0 100%;
+      }
+    }
     </style>
 
     <script>
@@ -42,12 +91,12 @@
                 {% if group_chat.agents.count > 0 %}
                 <div class="list-group">
                     {% for agent in group_chat.agents.all %}
-                    <a href="#!" class="list-group-item list-group-item-action flex-column align-items-start mb-3" onclick="showPopup('{{ agent.name }}', '#agentModal{{ agent.slug }}')">
+                    <a href="#!" class="card list-group-item list-group-item-action flex-column align-items-start mb-3" onclick="showPopup('{{ agent.name }}', '#agentModal{{ agent.slug }}')">
                         <div class="d-flex w-100 justify-content-between">
-                          <h5 class="mb-2 h5">{{ agent.name }}</h5>
+                          <h5 class="mb-2 h5 card-title">{{ agent.name }}</h5>
                           <small class="text-muted">Agent</small>
                         </div>
-                        <p class="mb-2">{{ agent.instruction }}</p>
+                        <p class="mb-2 card-text">{{ agent.instruction }}</p>
                     </a>
                         <div class="modal" id="agentModal{{ agent.slug }}" tabindex="-1" role="dialog">
                             <div class="modal-dialog" role="document">

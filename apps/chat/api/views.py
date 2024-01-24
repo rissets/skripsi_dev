@@ -241,18 +241,13 @@ class BackendApiTeachable(View):
         return response
 
     def extract_pdf(self, pdf_text):
-        # extract pdf per dot if after . is capital letter
-        paragraphs = []
-        paragraph = ''
-        for word in pdf_text.split():
-            if word.endswith('.'):
-                paragraph += word
-                paragraphs.append(paragraph)
-                paragraph = ''
-            else:
-                paragraph += word + ' '
+        # extract pdf per page page 0, page 1, ect
 
-        return paragraphs
+        pdf_text = pdf_text.split('page')
+        pdf_text = [text for text in pdf_text if text != '']
+        pdf_text = [text.strip() for text in pdf_text]
+
+        return pdf_text
 
     @method_decorator(csrf_exempt)
     @method_decorator(require_POST)

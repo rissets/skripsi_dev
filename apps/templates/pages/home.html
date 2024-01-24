@@ -1,16 +1,69 @@
 {% extends "pages/base.html" %}
 
+{% block extra_style %}
+<style>
+    .card {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bayangan tipis */
+      border-radius: 15px; /* Sudut bulat */
+      transition: box-shadow 0.3s ease; /* Efek transisi untuk bayangan */
+    }
+
+    .card:hover {
+        transform: scale(1.02);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Bayangan sedikit lebih tebal saat dihover */
+    }
+
+    .card-title {
+      font-weight: bold;
+      color: #333; /* Warna teks sesuai kebutuhan */
+    }
+
+    .card-text {
+      font-weight: 500;
+      color: #666; /* Warna teks sesuai kebutuhan */
+    }
+
+    .card img {
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+      object-fit: cover;
+      height: 200px; /* Sesuaikan tinggi gambar sesuai kebutuhan */
+    }
+
+    #content {
+      background-color: #f8f9fa; /* Warna latar belakang sesuai kebutuhan */
+      padding: 4rem;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .col-md-6 {
+      flex: 0 0 calc(50% - 1rem);
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .col-md-6 {
+        flex: 0 0 100%;
+      }
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
-    <div id="content" class="p-4 p-md-5 pt-5">
-        <h2 class="mb-4">Home</h2>
-        <div class="row">
+<div id="content" class="p-4 p-md-5 pt-5">
+  <div class="row">
     <!-- Card 1 -->
     <div class="col-md-6 mb-4">
       <div class="card">
         <img src="https://placehold.it/400x200" class="card-img-top" alt="Card Image">
         <div class="card-body">
-          <h5 class="card-title">Card 1</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <h5 class="card-title">Expert Coding Assistant</h5>
+          <p class="card-text">Connect with knowledgeable experts to enhance your coding skills and get guidance on programming challenges. Whether you're a beginner or an experienced coder, our experts are here to help you succeed in your coding journey.</p>
         </div>
       </div>
     </div>
@@ -20,21 +73,19 @@
       <div class="card">
         <img src="https://placehold.it/400x200" class="card-img-top" alt="Card Image">
         <div class="card-body">
-          <h5 class="card-title">Card 2</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <h5 class="card-title">Assistant for Understanding PDF Documents</h5>
+          <p class="card-text">Explore a powerful assistant designed to help you comprehend and extract information from PDF documents. Whether you need to analyze research papers, review reports, or understand complex documentation, our PDF assistant is here to streamline your document understanding process.</p>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="row">
     <!-- Card 3 -->
     <div class="col-md-6 mb-4">
       <div class="card">
         <img src="https://placehold.it/400x200" class="card-img-top" alt="Card Image">
         <div class="card-body">
-          <h5 class="card-title">Card 3</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <h5 class="card-title">Teachable Agent</h5>
+          <p class="card-text">Experience the innovation of a teachable agent, your personalized digital assistant that adapts to your learning style. Whether you're mastering new skills, exploring educational content, or seeking guidance, our teachable agent is here to enhance your learning journey.</p>
         </div>
       </div>
     </div>
@@ -44,11 +95,12 @@
       <div class="card">
         <img src="https://placehold.it/400x200" class="card-img-top" alt="Card Image">
         <div class="card-body">
-          <h5 class="card-title">Card 4</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <h5 class="card-title">Assistant Group Chat</h5>
+          <p class="card-text">Engage in collaborative discussions and problem-solving with our Assistant Group Chat feature. Whether you're working on projects, seeking advice, or sharing knowledge, our group chat facilitates seamless communication and fosters a supportive environment for all participants.</p>
         </div>
       </div>
     </div>
   </div>
-    </div>
+</div>
+
 {% endblock %}

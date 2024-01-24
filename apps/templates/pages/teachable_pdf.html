@@ -7,7 +7,7 @@
     <script src="{% static "js/icons.js" %}"></script>
     <script src="{% static "js/chat-teachable-pdf.js" %}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@latest/dist/markdown-it.min.js"></script>
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@latest/build/styles/base16/dracula.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/base16/onedark.min.css">
     <script>
         const user_image        = `<img src="{% static 'images/user.png' %}" alt="User Avatar">`;
         const gpt_image         = `<img src="{% static 'images/gpt.jpg' %}" alt="GPT Avatar">`;
@@ -17,10 +17,8 @@
     </script>
     <style>
         .hljs {
-            color: #e9e9f4;
-            background: #28293629;
-            border-radius: var(--border-radius-1);
-            border: 1px solid var(--blur-border);
+            border-radius: 15px;
+            border: 1px solid #152733;
             font-size: 15px;
         }
 
@@ -87,10 +85,9 @@
             <div class="col-lg-7conversation disable-scrollbars">
                 <h2>Teachable Agent with PDF</h2>
                 <div id="notification-box" class="notification-box"></div>
-                <form method="post">
+                <form method="post" class="mt-4">
                     {% csrf_token %}
                     <div class="form-group">
-                        <label for="pdf-select">Select PDF for training</label>
                         <select class="form-control" id="pdf-select">
                             <option value="0">Select PDF</option>
                             {% for pdf in pdfs %}
@@ -98,7 +95,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <button type="button" class="btn btn-primary btn-block" onclick="trainPDF()">Train
+                    <button type="button" class="mt-3 btn btn-primary btn-block" onclick="trainPDF()">Train
                     </button>
                 </form>
                 <!-- Add this to your HTML file -->

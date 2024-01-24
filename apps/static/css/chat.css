@@ -1,4 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900");
+
 
 /* :root {
     --colour-1: #ffffff;
@@ -16,12 +18,12 @@
 } */
 
 :root {
-    /*--colour-1: #000000;*/
-    /*--colour-2: #ccc;*/
-    /*--colour-3: #e4d4ff;*/
-    /*--colour-4: #f0f0f0;*/
-    /*--colour-5: #181818;*/
-    /*--colour-6: #242424;*/
+    --colour-1: #000000;
+    --colour-2: #ccc;
+    --colour-3: #152733;
+    --colour-4: #152733;
+    --colour-5: #181818;
+    --colour-6: #242424;
 
     /*--accent: #8b3dff;*/
     /*--blur-bg: #16101b66;*/
@@ -31,9 +33,15 @@
 }
 
 :root {
-    --font-1: "Inter", sans-serif;
-    --section-gap: 25px;
-    --border-radius-1: 8px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    /*--font-1: "Inter", sans-serif;*/
+    /*--section-gap: 25px;*/
+    /*--border-radius-1: 8px;*/
+}
+
+body {
+    color: #152733;
 }
 
 /** {*/
@@ -64,13 +72,11 @@
 /*}*/
 
 .box {
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     /*background-color: var(--blur-bg);*/
     height: 100%;
     width: 100%;
-    border-radius: var(--border-radius-1);
-    border: 1px solid var(--blur-border);
+    border-radius: 15px;
+    /*border: 1px solid #152733;*/
 }
 
 .conversations {
@@ -86,12 +92,11 @@
 .conversation {
     width: 100%;
     min-height: 50%;
-    height: 90vh;
+    height: 100vh;
     overflow-y: scroll;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    gap: 15px;
 }
 
 .conversation #messages {
@@ -104,9 +109,9 @@
     padding-bottom: 50px;
 }
 
-.conversation .user-input {
-    max-height: 10vh;
-}
+/*.conversation .user-input {*/
+/*    max-height: 10vh;*/
+/*}*/
 
 .conversation .user-input input {
     font-size: 15px;
@@ -120,7 +125,7 @@
 }
 
 .conversation .user-input input::placeholder {
-    color: var(--user-input)
+    color: #152733
 }
 
 .gradient:nth-child(1) {
@@ -194,9 +199,8 @@
     width: 100%;
     overflow-wrap: break-word;
     display: flex;
-    gap: var(--section-gap);
-    padding: var(--section-gap);
-    padding-bottom: 0;
+    gap: 15px;
+    padding: 15px;
 }
 
 .message:last-child {
@@ -221,7 +225,7 @@
     height: 100%;
     object-fit: cover;
     border-radius: 8px;
-    outline: 1px solid var(--blur-border);
+    outline: 1px solid #152733;
 }
 
 /*.message .user:after {*/
@@ -246,8 +250,8 @@
 .message .content p,
 .message .content li,
 .message .content code {
-    font-size: 15px;
-    line-height: 1.3;
+    font-size: 14px;
+    /*line-height: 1.5;*/
 }
 
 .message .user i {
@@ -265,12 +269,12 @@
     cursor: pointer;
     user-select: none;
     background: transparent;
-    border: 1px dashed var(--conversations);
-    border-radius: var(--border-radius-1);
+    border: 1px dashed #152733;
+    border-radius: 15px;
 }
 
 .new_convo span {
-    color: var(--colour-3);
+    color: #152733;
     font-size: 14px;
 }
 
@@ -293,8 +297,8 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     background-color: var(--blur-bg);
-    border-radius: var(--border-radius-1);
-    border: 1px solid var(--blur-border);
+    border-radius: 15px;
+    border: 1px solid #152733;
     padding: 10px 15px;
     color: var(--colour-3);
     display: flex;
@@ -357,8 +361,8 @@ label {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     background-color: var(--blur-bg);
-    border-radius: var(--border-radius-1);
-    border: 1px solid var(--blur-border);
+    border-radius: 15px;
+    border: 1px solid #152733;
     display: block;
     border-radius: 100px;
     position: relative;
@@ -388,11 +392,11 @@ input:checked+label:after {
 }
 
 .buttons {
-    min-height: 10vh;
     display: flex;
     align-items: start;
     justify-content: left;
     width: 100%;
+    margin-bottom: 20px;
 }
 
 .field {
@@ -419,12 +423,10 @@ input:checked+label:after {
 }
 
 select {
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
+
     border-radius: 8px;
 
     -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
 
     cursor: pointer;
     background-color: var(--blur-bg);
@@ -474,8 +476,8 @@ select {
     cursor: pointer;
     user-select: none;
     background: transparent;
-    border: 1px solid #c7a2ff;
-    border-radius: var(--border-radius-1);
+    border: 1px solid #152733;
+    border-radius: 15px;
     width: 100%;
 }
 
@@ -626,7 +628,7 @@ ul {
 
 
 a:-webkit-any-link {
-    color: var(--accent);
+    color: #152733;
 }
 
 .conversation .user-input textarea {
@@ -666,7 +668,7 @@ a:-webkit-any-link {
     color: #fff;
     border-radius: .25rem;
     border: 1px solid #ffffff22;
-    background-color: #2d2b57;
+    background-color: #152733;
     background-image: url('data:image/svg+xml;utf-8,<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 5C5.73478 5 5.48043 5.10536 5.29289 5.29289C5.10536 5.48043 5 5.73478 5 6V20C5 20.2652 5.10536 20.5196 5.29289 20.7071C5.48043 20.8946 5.73478 21 6 21H18C18.2652 21 18.5196 20.8946 18.7071 20.7071C18.8946 20.5196 19 20.2652 19 20V6C19 5.73478 18.8946 5.48043 18.7071 5.29289C18.5196 5.10536 18.2652 5 18 5H16C15.4477 5 15 4.55228 15 4C15 3.44772 15.4477 3 16 3H18C18.7956 3 19.5587 3.31607 20.1213 3.87868C20.6839 4.44129 21 5.20435 21 6V20C21 20.7957 20.6839 21.5587 20.1213 22.1213C19.5587 22.6839 18.7957 23 18 23H6C5.20435 23 4.44129 22.6839 3.87868 22.1213C3.31607 21.5587 3 20.7957 3 20V6C3 5.20435 3.31607 4.44129 3.87868 3.87868C4.44129 3.31607 5.20435 3 6 3H8C8.55228 3 9 3.44772 9 4C9 4.55228 8.55228 5 8 5H6Z" fill="white"/><path fill-rule="evenodd" clip-rule="evenodd" d="M7 3C7 1.89543 7.89543 1 9 1H15C16.1046 1 17 1.89543 17 3V5C17 6.10457 16.1046 7 15 7H9C7.89543 7 7 6.10457 7 5V3ZM15 3H9V5H15V3Z" fill="white"/></svg>');
     background-repeat: no-repeat;
     background-position: center;

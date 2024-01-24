@@ -7,17 +7,15 @@
     <script src="{% static "js/icons.js" %}"></script>
     <script src="{% static "js/chat.js" %}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@latest/dist/markdown-it.min.js"></script>
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@latest/build/styles/base16/dracula.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/base16/onedark.min.css">
     <script>
         const user_image        = `<img src="{% static 'images/user.png' %}" alt="User Avatar">`;
         const gpt_image         = `<img src="{% static 'images/gpt.jpg' %}" alt="GPT Avatar">`;
     </script>
     <style>
         .hljs {
-            color: #e9e9f4;
-            background: #28293629;
-            border-radius: var(--border-radius-1);
-            border: 1px solid var(--blur-border);
+            border-radius: 15px;
+            border: 1px solid #152733;
             font-size: 15px;
         }
 
@@ -38,12 +36,12 @@
 
         /* Handle */
         #message-input::-webkit-scrollbar-thumb {
-            background: #c7a2ff;
+            background: #3b6e8d;
         }
 
         /* Handle on hover */
         #message-input::-webkit-scrollbar-thumb:hover {
-            background: #8b3dff;
+            background: #152733;
         }
     </style>
     <script src="{% static "js/highlight.min.js" %}"></script>
@@ -52,18 +50,18 @@
 {% endblock %}
 
 {% block content %}
-    <div id="content" class="p-4 p-md-5 pt-5">
+    <div id="content" class="pl-4 pr-4 pl-md-3 pr-md-3 mb-0">
         <div class="row">
-            <div class="col-lg-9 conversation disable-scrollbars border-right">
+            <div class="col-lg-9 conversation disable-scrollbars" style="border-right: 2px solid #152733;">
                 <div class="stop_generating stop_generating-hidden">
                     <button id="cancelButton">
                         <span>Stop Generating</span>
                         <i class="fa-regular fa-stop"></i>
                     </button>
                 </div>
-                <div class="box" id="messages">
+                <div class="box pt-4" id="messages">
                 </div>
-                <div class="user-input border-top">
+                <div class="user-input border-top mb-3">
                     <div class="box input-box">
                         <textarea id="message-input" placeholder="Ask a question" cols="30" rows="10" style="white-space: pre-wrap;" oninput="resizeTextarea(this)"></textarea>
                         <div id="send-button">
@@ -71,23 +69,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="buttons">
-                    <div class="field" style="background-color: #cccccc; margin-left: 0; padding-left: 20px; border-radius: 30px;">
-                        <select name="chat_mode" id="chat_mode">
-                            <option value="general" selected>general</option>
-                            <option value="html">html expert</option>
-                            <option value="python">python expert</option>
-                            <option value="javascript">javascript expert</option>
-                            <option value="react">react expert</option>
-                            <option value="php">php expert</option>
-                            <option value="java">java expert</option>
-                            <option value="cpp">c++ expert</option>
-                        </select>
-                    </div>
-                </div>
+
+
             </div>
 
-            <div class="col-lg-3 box conversations">
+            <div class="col-lg-3 box conversations pt-4">
                 <div class="top">
                     <button class="new_convo" onclick="new_conversation()">
                         <i class="fa-regular fa-plus"></i>
@@ -101,11 +87,22 @@
                         <span>Clear Conversations</span>
                     </button>
                 </div>
+                    <div class="border-top mt-2">
+                        <h6 class="mt-4 mb-3">Select Expert Assistant</h6>
+                        <select class="form-control" name="chat_mode" id="chat_mode" style="border: 1px solid #152733; border-radius: 15px;">
+                            <option value="general" selected>general</option>
+                            <option value="html">html expert</option>
+                            <option value="python">python expert</option>
+                            <option value="javascript">javascript expert</option>
+                            <option value="react">react expert</option>
+                            <option value="php">php expert</option>
+                            <option value="java">java expert</option>
+                            <option value="cpp">c++ expert</option>
+                        </select>
+                    </div>
             </div>
         </div>
-        <div class="mobile-sidebar">
-            <i class="fa-solid fa-bars"></i>
-        </div>
+
     </div>
 {% endblock %}
 
