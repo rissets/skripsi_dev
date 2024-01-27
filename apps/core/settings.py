@@ -136,7 +136,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MODEL_URL="https://bangladesh-switches-drag-passes.trycloudflare.com/"
+MODEL_URL="https://selected-monday-array-bass.trycloudflare.com/"
 
 
 # email settings

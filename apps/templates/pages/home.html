@@ -1,4 +1,5 @@
 {% extends "pages/base.html" %}
+{% load static %}
 
 {% block extra_style %}
 <style>
@@ -27,7 +28,7 @@
       border-top-left-radius: 15px;
       border-top-right-radius: 15px;
       object-fit: cover;
-      height: 200px; /* Sesuaikan tinggi gambar sesuai kebutuhan */
+      height: 230px; /* Sesuaikan tinggi gambar sesuai kebutuhan */
     }
 
     #content {
@@ -59,41 +60,50 @@
   <div class="row">
     <!-- Card 1 -->
     <div class="col-md-6 mb-4">
-      <div class="card">
-        <img src="https://placehold.it/400x200" class="card-img-top" alt="Card Image">
-        <div class="card-body">
-          <h5 class="card-title">Expert Coding Assistant</h5>
-          <p class="card-text">Connect with knowledgeable experts to enhance your coding skills and get guidance on programming challenges. Whether you're a beginner or an experienced coder, our experts are here to help you succeed in your coding journey.</p>
-        </div>
-      </div>
+        <a href="{% url "chat:index" %}">
+            <div class="card">
+                <img src="{% static "images/chatbot.png" %}" class="card-img-top" alt="Card Image">
+                <div class="card-body">
+                    <h5 class="card-title">Expert Coding Assistant</h5>
+                    <p class="card-text">Connect with knowledgeable experts to enhance your coding skills and get guidance
+                        on programming challenges. Whether you're a beginner or an experienced coder, our experts are here
+                        to help you succeed in your coding journey.</p>
+                </div>
+            </div>
+        </a>
     </div>
 
     <!-- Card 2 -->
     <div class="col-md-6 mb-4">
+      <a href="{% url "chat:pdfs" %}">
       <div class="card">
-        <img src="https://placehold.it/400x200" class="card-img-top" alt="Card Image">
+        <img src="{% static "images/chatpdf.png" %}" class="card-img-top" alt="Card Image">
         <div class="card-body">
           <h5 class="card-title">Assistant for Understanding PDF Documents</h5>
           <p class="card-text">Explore a powerful assistant designed to help you comprehend and extract information from PDF documents. Whether you need to analyze research papers, review reports, or understand complex documentation, our PDF assistant is here to streamline your document understanding process.</p>
         </div>
       </div>
+      </a>
     </div>
 
     <!-- Card 3 -->
     <div class="col-md-6 mb-4">
-      <div class="card">
-        <img src="https://placehold.it/400x200" class="card-img-top" alt="Card Image">
-        <div class="card-body">
-          <h5 class="card-title">Teachable Agent</h5>
-          <p class="card-text">Experience the innovation of a teachable agent, your personalized digital assistant that adapts to your learning style. Whether you're mastering new skills, exploring educational content, or seeking guidance, our teachable agent is here to enhance your learning journey.</p>
-        </div>
-      </div>
+        <a href="{% url "chat:teachable-agent" %}">
+          <div class="card">
+            <img src="{% static "images/teachable.png" %}" class="card-img-top" alt="Card Image">
+            <div class="card-body">
+              <h5 class="card-title">Teachable Agent</h5>
+              <p class="card-text">Experience the innovation of a teachable agent, your personalized digital assistant that adapts to your learning style. Whether you're mastering new skills, exploring educational content, or seeking guidance, our teachable agent is here to enhance your learning journey.</p>
+            </div>
+          </div>
+        </a>
     </div>
 
     <!-- Card 4 -->
     <div class="col-md-6 mb-4">
+        <a href="{% url "chat:group-chat" %}"></a>
       <div class="card">
-        <img src="https://placehold.it/400x200" class="card-img-top" alt="Card Image">
+        <img src="{% static "images/groupchat.png" %}" class="card-img-top" alt="Card Image">
         <div class="card-body">
           <h5 class="card-title">Assistant Group Chat</h5>
           <p class="card-text">Engage in collaborative discussions and problem-solving with our Assistant Group Chat feature. Whether you're working on projects, seeking advice, or sharing knowledge, our group chat facilitates seamless communication and fosters a supportive environment for all participants.</p>
