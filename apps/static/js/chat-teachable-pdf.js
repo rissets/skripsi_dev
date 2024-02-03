@@ -20,11 +20,12 @@ const trainPDF = async () => {
       alert('Please select a PDF before training.');
       return;
     }
-
+    console.log(selectedPdfId);
+    console.log(teachable_agent);
     // Show loading overlay
     showLoadingOverlay();
 
-    const response = await fetch(`/api/v2/teachable`, {
+    await fetch(`/api/v2/teachable`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -50,10 +51,10 @@ const trainPDF = async () => {
     });
 
     // Hide loading overlay
-    hideLoadingOverlay();
+    // hideLoadingOverlay();
 
-    const reader = response.body.getReader();
-    console.log(reader);
+    // const reader = response.body.getReader();
+    // console.log(reader);
 
     // Display success notification
 
@@ -71,15 +72,15 @@ const showLoadingOverlay = () => {
   setTimeout(() => {
     overlay.style.display = 'none';
     showNotification('Training completed. You will receive an email when the process is finished.');
-  }, 10000);
+  }, 1000);
 
 };
 
 // Function to hide loading overlay
-const hideLoadingOverlay = () => {
-  const overlay = document.getElementById('loading-overlay');
-  overlay.style.display = 'none';
-};
+// const hideLoadingOverlay = () => {
+//   const overlay = document.getElementById('loading-overlay');
+//   overlay.style.display = 'none';
+// };
 
 // Function to display notification
 const showNotification = (message) => {
@@ -92,5 +93,5 @@ const showNotification = (message) => {
   // Hide notification after 5 seconds
   setTimeout(() => {
     notificationBox.style.display = 'none';
-  }, 10000);
+  }, 1000);
 };

@@ -128,9 +128,9 @@ class BackendApiPDF(View):
             endpoint = settings.MODEL_URL
             url = f"{endpoint}v1/chat/completions"
 
-            if len(pdf_content.split(' ')) > 20000 and _conversation == []:
+            if len(pdf_content.split(' ')) > 11000 and _conversation == []:
 
-                contents = [pdf_content[i:i + 20000] for i in range(0, len(pdf_content), 20000)]
+                contents = [pdf_content[i:i + 10000] for i in range(0, len(pdf_content), 10000)]
 
                 for i in range(len(contents)):
                     pdf_content = contents[i]
@@ -239,18 +239,129 @@ class BackendApiTeachable(View):
         "cache_seed": None,
     }
 
-    # user = autogen.UserProxyAgent(
-    #     "user",
-    #     human_input_mode="NEVER",
-    #     is_termination_msg=lambda x: True if "TERMINATE" in x.get("content") else False,
-    #     max_consecutive_auto_reply=0,
-    #     code_execution_config={
-    #         "work_dir": "./tmp/notebook",
-    #         "use_docker": False
-    #     },
-    #     # system_message="My name is danang haris setiawan",
-    #     # default_auto_reply=
-    # )
+    def create_teachable_agent(self, reset_db=False, verbosity=0, db_dir=None):
+
+        # Start by instantiating any agent that inherits from ConversableAgent.
+        teachable_agent = autogen.ConversableAgent(
+            name="teachable_agent",
+            llm_config=self.llm_config,  #
+            code_execution_config={
+                "work_dir": f"./tmp/_output",
+                "use_docker": False
+            }
+        )
+
+        # Instantiate the Teachability capability. Its parameters are all optional.
+        teachability = Teachability(
+            verbosity=verbosity,
+            reset_db=reset_db,
+            path_to_db_dir=f"./tmp/{db_dir}/teachability_db",
+            recall_threshold=1,  # Higher numbers allow more (but less relevant) memos to be recalled.
+        )
+
+        # Now add the Teachability capability to the agent.
+        teachability.add_to_agent(teachable_agent)
+
+        return teachable_agent
+
+    def extract_pdf(self, pdf_text):
+        # extract pdf per page page 0, page 1, ect
+
+        pdf_text = pdf_text.split('page')
+        pdf_text = [text for text in pdf_text if text != '']
+        pdf_text = [text.strip() for text in pdf_text]
+
+        print(pdf_text)
+        return pdf_text
+
+    @method_decorator(csrf_exempt)
+    @method_decorator(require_POST)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            json_data = loads(request.body)
+            # _conversation = json_data['meta']['content']['conversation']
+            prompt = json_data['meta']['content']['parts'][0]['content']
+            teachable_agent_name = json_data['meta']['content']['teachable_agent_slug']
+
+            agent = request.user.teachable_agents.get(slug=teachable_agent_name)
+
+            if agent.mode == 'QA':
+                conversation = prompt
+                teachable_agent = self.create_teachable_agent(reset_db=False, verbosity=0, db_dir=teachable_agent_name)
+                user = autogen.ConversableAgent("user",
+                                                llm_config=False,
+                                                human_input_mode="NEVER",
+                                                max_consecutive_auto_reply=0,
+                                                code_execution_config={
+                                                    "work_dir": f"./tmp/{teachable_agent_name}/_output",
+                                                    "use_docker": False
+                                                }
+                                                )
+
+                user.initiate_chat(recipient=teachable_agent, message=conversation)
+
+                response = user.last_message(teachable_agent)
+
+                def stream():
+                    # respon kata perkata
+                    for chunk in response['content']:
+                        yield chunk
+
+                return StreamingHttpResponse(stream(), content_type='text/event-stream')
+            else:
+                teachable_agent = self.create_teachable_agent(reset_db=False, verbosity=0, db_dir=teachable_agent_name)
+                user = autogen.ConversableAgent("user",
+                                                llm_config=False,
+                                                human_input_mode="NEVER",
+                                                max_consecutive_auto_reply=0,
+                                                code_execution_config={
+                                                    "work_dir": f"./tmp/{teachable_agent_name}/_output",
+                                                    "use_docker": False
+                                                }
+                                                )
+                pdf = request.user.pdfs.get(pk=int(json_data['meta']['content']['pdf_id']))
+                print(f"pdf {pdf}")
+                if agent.is_active:
+                    agent.is_active = False
+                    agent.save()
+
+                for conversation in self.extract_pdf(pdf.content):
+                    user.initiate_chat(recipient=teachable_agent, message=conversation)
+
+                agent.is_active = True
+                agent.save()
+
+                return JsonResponse({ '_action': '_ask', 'success': True, 'message': 'Teachable agent is active' })
+
+
+
+        except Exception as e:
+            print(e)
+            print(e.__traceback__.tb_next)
+            return JsonResponse({
+                '_action': '_ask',
+                'success': False,
+                "error": f"an error occurred {str(e)}"
+            }, status=400)
+
+
+class BackendApiTestTeachable(View):
+    config_list = [
+        {
+            "model": "TheBloke_Magicoder-S-DS-6.7B-GPTQ_gptq-4bit-32g-actorder_True",
+            "base_url": f"{settings.MODEL_URL}v1/",
+            'api_key': 'any string here is fine',
+        }
+    ]
+
+    llm_config = {
+        "config_list": config_list,
+        "temperature": 0.7,
+        "timeout": 120,
+    }
 
     def create_teachable_agent(self, reset_db=False, verbosity=0, db_dir=None):
 
@@ -277,162 +388,6 @@ class BackendApiTeachable(View):
 
         return teachable_agent
 
-    def interact_freely_with_agent(self, message, db_dir):
-        pass
-        """Starts a free-form chat between the user and a teachable agent."""
-
-        # Create the agents.
-
-        # teachable_agent.initiate_chat(user, message="Hi, I'm a teachable user assistant! What's on your mind?",
-        #                               clear_history=True)
-
-        # Start the chat.
-
-        # return user,
-
-    def extract_pdf(self, pdf_text):
-        # extract pdf per page page 0, page 1, ect
-
-        pdf_text = pdf_text.split('page')
-        pdf_text = [text for text in pdf_text if text != '']
-        pdf_text = [text.strip() for text in pdf_text]
-
-        return pdf_text
-
-    @method_decorator(csrf_exempt)
-    @method_decorator(require_POST)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        try:
-            json_data = loads(request.body)
-            _conversation = json_data['meta']['content']['conversation']
-            prompt = json_data['meta']['content']['parts'][0]['content']
-            teachable_agent_name = json_data['meta']['content']['teachable_agent_slug']
-
-            agent = request.user.teachable_agents.get(slug=teachable_agent_name)
-
-            if agent.mode == 'QA':
-                conversation = prompt
-                teachable_agent = self.create_teachable_agent(reset_db=False, verbosity=0, db_dir=teachable_agent_name)
-                user = autogen.ConversableAgent("user",
-                                                llm_config=False,
-                                                human_input_mode="NEVER",
-                                                max_consecutive_auto_reply=0,
-                                                code_execution_config={
-                                                    "work_dir": f"./tmp/{teachable_agent_name}/_output",
-                                                    "use_docker": False
-                                                }
-                                                )
-                # if _conversation != []:
-                user.initiate_chat(recipient=teachable_agent, message=conversation)
-
-                # response = user.last_message(teachable_agent)
-                # else:
-                #     self.user.send(recipient=teachable_agent, message=conversation, request_reply=True)
-
-                response = user.last_message(teachable_agent)
-
-                print(_conversation)
-
-                print(response['content'])
-
-                def stream():
-                    # respon kata perkata
-                    for chunk in response['content']:
-                        yield chunk
-
-                return StreamingHttpResponse(stream(), content_type='text/event-stream')
-            else:
-                pdf = request.user.pdfs.get(pk=int(json_data['meta']['content']['pdf_id']))
-
-                if agent.is_active:
-                    agent.is_active = False
-                    agent.save()
-
-                responses = []
-                for conversation in self.extract_pdf(pdf.content):
-                    response = self.interact_freely_with_agent(conversation, db_dir=teachable_agent_name)
-                    responses.append(response['content'])
-
-                agent.is_active = True
-                agent.save()
-
-                def stream():
-                    # respon kata perkata
-                    for chunk in responses:
-                        for chunk2 in chunk:
-                            yield chunk2
-
-                return StreamingHttpResponse(stream(), content_type='text/event-stream')
-
-
-
-        except Exception as e:
-            print(e)
-            print(e.__traceback__.tb_next)
-            return JsonResponse({
-                '_action': '_ask',
-                'success': False,
-                "error": f"an error occurred {str(e)}"
-            }, status=400)
-
-
-class BackendApiTestTeachable(View):
-    config_list = [
-        {
-            "model": "TheBloke_Magicoder-S-DS-6.7B-GPTQ_gptq-4bit-32g-actorder_True",
-            "base_url": f"{settings.MODEL_URL}v1/",
-            'api_key': 'any string here is fine',
-            # 'api_type': 'openai',
-        }
-    ]
-
-    llm_config = {
-        "config_list": config_list,
-        "temperature": 0.7,
-        "seed": 1117,
-        "timeout": 120,
-    }
-
-    def create_teachable_agent(self, reset_db=False, verbosity=0, db_dir=None):
-
-        # Start by instantiating any agent that inherits from ConversableAgent.
-        teachable_agent = autogen.ConversableAgent(
-            name="teachable_agent",
-            llm_config={"config_list": self.config_list, "timeout": 120, "cache_seed": None},  # Disable caching.
-        )
-
-        # Instantiate the Teachability capability. Its parameters are all optional.
-        teachability = Teachability(
-            verbosity=verbosity,
-            reset_db=reset_db,
-            path_to_db_dir=f"./tmp/{db_dir}/teachability_db",
-            recall_threshold=0.5,  # Higher numbers allow more (but less relevant) memos to be recalled.
-        )
-
-        # Now add the Teachability capability to the agent.
-        teachability.add_to_agent(teachable_agent)
-
-        return teachable_agent, teachability
-
-    def interact_freely_with_agent(self, message, db_dir):
-        """Starts a free-form chat between the user and a teachable agent."""
-
-        # Create the agents.
-        teachable_agent, teachability = self.create_teachable_agent(reset_db=False, verbosity=0, db_dir=db_dir)
-        user = autogen.UserProxyAgent("user", human_input_mode="NEVER", max_consecutive_auto_reply=0,
-                                      code_execution_config={"work_dir": "./tmp/notebook", "use_docker": False})
-        # teachability.prepopulate_db()
-        #
-
-        # Start the chat.
-        user.initiate_chat(teachable_agent, message=message, clear_history=True)
-
-        response = user.last_message(teachable_agent)
-        return response
-
     @method_decorator(csrf_exempt)
     @method_decorator(require_POST)
     def dispatch(self, *args, **kwargs):
@@ -446,8 +401,24 @@ class BackendApiTestTeachable(View):
             agent_slug = json_data['agent_slug']
 
             print(agent_slug)
+            # response = self.interact_freely_with_agent(conversation, db_dir=agent_slug)
+
             conversation = prompt
-            response = self.interact_freely_with_agent(conversation, db_dir=agent_slug)
+            print(conversation)
+            teachable_agent = self.create_teachable_agent(reset_db=False, verbosity=0, db_dir=agent_slug)
+            user = autogen.ConversableAgent("user",
+                                            llm_config=False,
+                                            human_input_mode="NEVER",
+                                            max_consecutive_auto_reply=0,
+                                            code_execution_config={
+                                                "work_dir": f"./tmp/{agent_slug}/_output",
+                                                "use_docker": False
+                                            }
+                                            )
+
+            user.initiate_chat(recipient=teachable_agent, message=conversation)
+
+            response = user.last_message(teachable_agent)
 
             def stream():
                 # respon kata perkata
@@ -455,6 +426,7 @@ class BackendApiTestTeachable(View):
                     yield chunk
 
             return StreamingHttpResponse(stream(), content_type='text/event-stream')
+
 
         except Exception as e:
             print(e)
@@ -479,32 +451,20 @@ class BackendApiGroupChat(View):
     llm_config = {
         "config_list": config_list,
         "temperature": 0.7,
-        "seed": 1117,
         "timeout": 120,
     }
 
     all_messages = []
 
     def create_group_chat(self, agents: list):
-        """
-        agents = [
-        {
-            "name": "agent_name",
-            "instruction": "agent_instruction",
-        },
-        ...
-        ]
-        :param agents:
-        :return:
-        """
 
         def print_messages(recipient, messages, sender, config):
             if "callback" in config and config["callback"] is not None:
                 callback = config["callback"]
                 callback(sender, recipient, messages[-1])
-            print(f"Messages sent to: {recipient.name} | num messages: {len(messages)}")
+            # print(f"Messages sent to: {recipient.name} | num messages: {len(messages)}")
             print(f"Last Messages: {messages[-1]}")
-            print(f"Messsages: {messages}")
+            # print(f"Messsages: {messages}")
             self.all_messages.append(messages[-1])
 
             return False, None  # required to ensure the agent communication flow continues
@@ -538,7 +498,7 @@ class BackendApiGroupChat(View):
                 config={"callback": None},
             )
 
-        group_chat = autogen.GroupChat(agents=agents_list, messages=[], max_round=5)
+        group_chat = autogen.GroupChat(agents=agents_list, messages=[], max_round=10)
 
         return group_chat
 
@@ -556,31 +516,32 @@ class BackendApiGroupChat(View):
     def post(self, request, *args, **kwargs):
         try:
             json_data = loads(request.body)
-            # _conversation = json_data['meta']['content']['conversation']
             prompt = json_data['meta']['content']['parts'][0]['content']
             groupChat = json_data['groupChat']
-
-            print(groupChat)
 
             group_chat = self.request.user.group_chats.get(slug=groupChat)
             agents = []
             for agent in group_chat.agents.all():
                 agents.append({
-                    "name": agent.name,
+                    "name": agent.name.lower().replace(' ', '_'),
                     "instruction": agent.instruction,
                 })
-
+            
+            print(agents)
+            print(group_chat)
             group_chat = self.create_group_chat(agents=agents)
-            manager = self.initiate_chat(group_chat, message=prompt)
+            self.initiate_chat(group_chat, message=prompt)
 
-            print(self.all_messages)
             response = self.all_messages
 
             def stream():
-                # response content word by word
-                #     response = [{'content': 'dfsdfs'}, {'content': 'dfsdfs'}]
                 for chunk in response:
+                    name = f" \n\n **{chunk['name']}: ** \n " if 'name' in chunk and chunk['name'] else f" \n\n **{chunk.get('role', '')}** \n "
+                    for word in name.split(' '):
+                        yield word
+                    
                     chunk['content'] = chunk['content'].split(' ')
+                    
                     for word in chunk['content']:
                         # sleep(0.1)
                         time.sleep(0.03)

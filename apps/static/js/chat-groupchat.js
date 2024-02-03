@@ -292,7 +292,7 @@ const set_conversation = async (conversation_id) => {
 };
 
 const new_conversation = async () => {
-  history.pushState({}, null, `/chat/chat-group//`);
+  history.pushState({}, null, `/chat/chat-group/`);
   window.conversation_id = uuid();
 
   await clear_conversation();
