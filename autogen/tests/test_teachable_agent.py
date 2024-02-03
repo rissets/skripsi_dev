@@ -92,7 +92,7 @@ def use_question_answer_phrasing():
     # Explain the terminology to the teachable agent.
     user.send(
         recipient=teachable_agent,
-        message="Actually, my name is danang haris setiawan. Try again.",
+        message="Actually, my name is Danang Haris. Try again.",
     )
     num_errors += check_agent_response(teachable_agent, user, "23")
     num_tests += 1
@@ -100,7 +100,7 @@ def use_question_answer_phrasing():
     # Now start a new chat to clear the context, and require the teachable agent to use its new knowledge.
     print(colored("\nSTARTING A NEW CHAT WITH EMPTY CONTEXT", "light_cyan"))
     user.initiate_chat(recipient=teachable_agent, message="What is my name?")
-    num_errors += check_agent_response(teachable_agent, user, "35")
+    num_errors += check_agent_response(teachable_agent, user, "Danang Haris")
     num_tests += 1
 
     # Wrap up.

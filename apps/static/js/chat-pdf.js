@@ -12,6 +12,9 @@ const stop_generating = document.querySelector(`.stop_generating`);
 const send_button = document.querySelector(`#send-button`);
 let prompt_lock = false;
 
+// const content_pdf = document.querySelector(`#content-pdf`).value;
+// console.log(content_pdf);
+
 hljs.addPlugin(new CopyButtonPlugin());
 
 function resizeTextarea(textarea) {
@@ -128,7 +131,7 @@ const ask_gpt = async (message) => {
                 role: "user",
               },
               {
-                content_pdf: content_pdf,
+                content_pdf: pdfContent,
               }
             ],
           },

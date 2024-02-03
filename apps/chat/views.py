@@ -76,6 +76,7 @@ def read_pdf(pdf_file):
         pdf_text = ''
         for page_num in range(len(pdf_reader.pages)):
             page_obj = pdf_reader.pages[page_num]
+            # if text == ``` delete
             pdf_text += f"page {page_num} \n\n{page_obj.extract_text()}\n\n"
 
         count_words = len(pdf_text.split())
