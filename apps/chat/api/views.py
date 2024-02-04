@@ -39,9 +39,8 @@ class BackendApi(View):
             prompt = json_data['meta']['content']['parts'][0]
             chat_mode = json_data['chat_mode']
             print(chat_mode)
-            current_date = datetime.now().strftime("%Y-%m-%d")
             if chat_mode == 'general':
-                system_message = f'You are an exceptionally intelligent {chat_mode} coding assistant that consistently delivers accurate and reliable responses to user instructions.'
+                system_message = f'You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.'
             else:
                 system_message = f'You are an exceptionally intelligent {chat_mode} coding assistant that consistently delivers accurate and reliable responses to user instructions.'
 
@@ -118,19 +117,13 @@ class BackendApiPDF(View):
             _conversation = json_data['meta']['content']['conversation']
             prompt = json_data['meta']['content']['parts'][0]
             pdf_content = json_data['meta']['content']['parts'][1]['content_pdf']
-            # print(prompt)
-            # print(pdf_content)
-            # print(_conversation)
-            # prompt = f"""{pdf_content} \n {prompt}"""
-
-            # split pdf if len words > 10000 and store per 5000 in dict
 
             endpoint = settings.MODEL_URL
             url = f"{endpoint}v1/chat/completions"
 
-            if len(pdf_content.split(' ')) > 11000 and _conversation == []:
+            if len(pdf_content.split(' ')) > 20000 and _conversation == []:
 
-                contents = [pdf_content[i:i + 10000] for i in range(0, len(pdf_content), 10000)]
+                contents = [pdf_content[i:i + 5000] for i in range(0, len(pdf_content), 5000)]
 
                 for i in range(len(contents)):
                     pdf_content = contents[i]
@@ -155,6 +148,12 @@ class BackendApiPDF(View):
                 system_message = f"""
                         You are a highly intelligent learning assistant that consistently provides accurate and reliable responses to user instructions based on previous chat history.
                         """
+            elif len(pdf_content.split(' ')) > 5000:
+                system_message = f"""
+                    You are an assistant who can summarize, explain, draw lessons from these pdf documents. and consistently provide accurate and reliable responses to users.
+
+                    pdf document: {pdf_content[:5000]}
+                    """
 
             else:
                 system_message = f"""
@@ -165,8 +164,8 @@ class BackendApiPDF(View):
 
             conversation = [{'role': 'system', 'content': system_message}] + \
                            _conversation + [prompt]
-
-            print(conversation)
+            
+            print(_conversation)
 
             gpt_resp = post(
                 url=url,
@@ -306,9 +305,13 @@ class BackendApiTeachable(View):
                 response = user.last_message(teachable_agent)
 
                 def stream():
-                    # respon kata perkata
-                    for chunk in response['content']:
-                        yield chunk
+                    
+                    response['content'] = response['content'].split(' ')
+                    
+                    for word in response['content']:
+                        # sleep(0.1)
+                        time.sleep(0.03)
+                        yield word + ' '
 
                 return StreamingHttpResponse(stream(), content_type='text/event-stream')
             else:
@@ -422,8 +425,12 @@ class BackendApiTestTeachable(View):
 
             def stream():
                 # respon kata perkata
-                for chunk in response['content']:
-                    yield chunk
+                response['content'] = response['content'].split(' ')
+                
+                for word in response['content']:
+                    # sleep(0.1)
+                    time.sleep(0.03)
+                    yield word + ' '
 
             return StreamingHttpResponse(stream(), content_type='text/event-stream')
 

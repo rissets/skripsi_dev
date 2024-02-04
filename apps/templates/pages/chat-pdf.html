@@ -38,13 +38,13 @@
                 <div class="col-md-6 offset-md-3">
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="text-center">Drag and Drop PDF</h2>
+                            <h3 class="text-center">Upload PDF</h2>
                         </div>
                         <div class="card-body">
                             <form id="uploadForm" method="post" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="form-group">
-                                    <label for="pdfFile">Drop PDF file here or click to upload</label>
+                                    <label for="pdfFile">Upload PDF file here, click to upload</label>
                                     <input type="file" class="form-control-file" id="pdfFile" name="pdf_file"
                                            accept=".pdf">
                                 </div>

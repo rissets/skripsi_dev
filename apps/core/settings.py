@@ -136,7 +136,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MODEL_URL = "https://injection-joyce-kenya-arising.trycloudflare.com/"
+MODEL_URL = "https://protocols-validation-optimize-windsor.trycloudflare.com/"
 
 
 # email settings
